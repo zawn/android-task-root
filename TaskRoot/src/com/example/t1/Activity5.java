@@ -51,7 +51,10 @@ public class Activity5 extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				TaskRoot.switchActivity(Activity5.this, Activity2.class);
+//				TaskRoot.switchActivity(Activity5.this, Activity2.class);
+				Bundle bundle =new Bundle();
+				bundle.putCharSequence("zawn", "This is bundle data");
+				TaskRoot.switchActivity(Activity5.this, Activity2.class,bundle);
 			}
 		});
 		Button button_satart_a4 = (Button) findViewById(R.id.button_satart_a4);

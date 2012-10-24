@@ -35,6 +35,7 @@ public class Activity2 extends Activity {
 				startActivity(intent);
 			}
 		});
+		button.setText(getIntent().getCharSequenceExtra("zawn"));
 	}
 
 	@Override

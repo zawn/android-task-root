@@ -42,6 +42,7 @@ public final class TaskRoot extends Activity {
 	private static boolean mIsNewIntent;
 	private static final String ORIGINAL_INTENT = "original_intent";
 	private static final String TARGET_CLASS = "cn.mimail.TARGET_CLASS";
+	private static final String BUNDLE_DATA = "cn.mimail.BUNDLE_DATA";
 	private boolean mInitiativeDestroy;
 
 	/*
@@ -50,12 +51,16 @@ public final class TaskRoot extends Activity {
 	private static final Class<?> clazz = Activity1.class;
 
 	private void intentHandler(final Intent intent) {
-		final Class<?> cls = (Class<?>) intent.getSerializableExtra(TaskRoot.TARGET_CLASS);
+		final Class<?> cls = (Class<?>) intent.getSerializableExtra(TARGET_CLASS);
+		final Bundle bundle = (Bundle) intent.getBundleExtra(BUNDLE_DATA);
 		Log.i(TAG, "Target class is:" + ((cls == null) ? "null" : cls.getName()));
 		final Intent i;
 		if (cls == null) {
 			Log.i(TAG, "Start the default activity");
 			i = new Intent(this, clazz);
+			if (bundle != null) {
+				i.putExtras(bundle);
+			}
 			startActivity(i);
 		} else {
 			if (cls.isInstance(TaskRoot.this)) {
@@ -66,6 +71,9 @@ public final class TaskRoot extends Activity {
 				initiativeDestroy();
 			} else {
 				i = new Intent(this, cls);
+				if (bundle != null) {
+					i.putExtras(bundle);
+				}
 				startActivity(i);
 			}
 		}
@@ -147,15 +155,33 @@ public final class TaskRoot extends Activity {
 	/**
 	 * 用于切换程序逻辑分支的便利方法,执行该方法后会销毁在Back Stack中除 <br>
 	 * {@link TaskRoot} 以外的所有{@link Activity} ,并启动方法参数 <code>cls </code>指定的 {@link Activity}<br>
-	 * <br>注:如果cls指定的{@link Activity}是{@link TaskRoot}本身,因为{@link TaskRoot}是不可见的此<br>时{@link TaskRoot}将自我销毁,程序退出.
+	 * <br>
+	 * 注:如果cls指定的{@link Activity}是{@link TaskRoot}本身,因为{@link TaskRoot}是不可见的此<br>
+	 * 时{@link TaskRoot}将自我销毁,程序退出.
 	 * 
 	 * @param packageContext A Context of the application package implementing this class.
 	 * @param cls The component class that is to be used for the intent.
 	 */
 	public static void switchActivity(Context packageContext, Class<?> cls) {
+		switchActivity(packageContext, cls, null);
+	}
+
+	/**
+	 * 用于切换程序逻辑分支的便利方法,执行该方法后会销毁在Back Stack中除 <br>
+	 * {@link TaskRoot} 以外的所有{@link Activity} ,并启动方法参数 <code>cls </code>指定的 {@link Activity}<br>
+	 * <br>
+	 * 注:如果cls指定的{@link Activity}是{@link TaskRoot}本身,因为{@link TaskRoot}是不可见的此<br>
+	 * 时{@link TaskRoot}将自我销毁,程序退出.
+	 * 
+	 * @param packageContext A Context of the application package implementing this class.
+	 * @param cls The component class that is to be used for the intent.
+	 * @param bundle To attach to the intent of the parameters
+	 */
+	public static void switchActivity(Context packageContext, Class<?> cls, Bundle bundle) {
 		Intent intent = new Intent(packageContext, TaskRoot.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		intent.putExtra(TARGET_CLASS, cls);
+		intent.putExtra(BUNDLE_DATA, bundle);
 		packageContext.startActivity(intent);
 	}
 }
