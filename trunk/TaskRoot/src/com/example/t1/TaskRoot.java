@@ -1,6 +1,6 @@
 /*
  * Name   RootActivity.java
- * Author ZhangZhenli
+ * Author Zawn
  * Created on 2012-10-22, 上午11:57:58
  *
  * Copyright (c) 2012 NanJing YiWuXian Network Technology Co., Ltd. All rights reserved
@@ -34,7 +34,7 @@ import android.view.KeyEvent;
  * 该Activity没有视图界面,只用于接收Intent并启动相应的Activity,并作为程序的Task<br>
  * 的Root存在,用于程序退出.
  * 
- * @author ZhangZhenli
+ * @author Zawn
  */
 public final class TaskRoot extends Activity {
 
