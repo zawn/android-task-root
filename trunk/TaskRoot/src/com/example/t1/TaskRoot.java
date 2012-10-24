@@ -13,7 +13,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 
 /**
  * TaskRoot应是其所在的Task的根Activity,即在程序的<code>AndroidManifest.xml</code><br>
