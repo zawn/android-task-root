@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import cn.mimail.misdk.BuildConfig;
 
 /**
  * TaskRoot应是其所在的Task的根Activity,即在程序的<code>AndroidManifest.xml</code><br>
@@ -55,7 +56,8 @@ public final class MiTask extends Activity {
 		Log.i(TAG, "Target class is:" + ((cls == null) ? "null" : cls.getName()));
 		final Intent i;
 		if (cls == null) {
-			Log.i(TAG, "Start the default activity");
+			if (BuildConfig.DEBUG)
+				Log.i(TAG, "Start the default activity");
 			i = new Intent(this, clazz);
 			if (bundle != null) {
 				i.putExtras(bundle);
@@ -80,7 +82,8 @@ public final class MiTask extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		Log.i(TAG, "onCreate");
+		if (BuildConfig.DEBUG)
+			Log.i(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
 		if (!isTaskRoot()) {
 			throw new RuntimeException("MiTask is not the root of this task.  The root is the first activity in a task.");
@@ -105,10 +108,12 @@ public final class MiTask extends Activity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		Log.i(TAG, "onDestroy");
+		if (BuildConfig.DEBUG)
+			Log.i(TAG, "onDestroy");
 		if (mInitiativeDestroy) {
 			mInitiativeDestroy = false;
-			Log.i(TAG, "Start terminate instances");
+			if (BuildConfig.DEBUG)
+				Log.i(TAG, "Start terminate instances");
 			android.os.Process.killProcess(android.os.Process.myPid());
 			// 接下来的所有逻辑将不会被执行,包括上一个Activity的onStop和onDestroy方法
 		}
@@ -116,7 +121,8 @@ public final class MiTask extends Activity {
 
 	@Override
 	protected void onNewIntent(final Intent intent) {
-		Log.i(TAG, "onNewIntent");
+		if (BuildConfig.DEBUG)
+			Log.i(TAG, "onNewIntent");
 		mIsNewIntent = true;
 		setIntent(intent);
 		intentHandler(intent);
@@ -125,21 +131,25 @@ public final class MiTask extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		Log.i(TAG, "onResume");
+		if (BuildConfig.DEBUG)
+			Log.i(TAG, "onResume");
 		if (mIsNewIntent) {
 			// 置位,等待下一次NewIntent的到来.
-			Log.i(TAG, "mIsNewIntent = true");
+			if (BuildConfig.DEBUG)
+				Log.i(TAG, "mIsNewIntent = true");
 			mIsNewIntent = false;
 		} else {
 			// 说明该Intent不是新传入的,既是通过返回键返回到该实例的,这是Task中只有该实例了,应终止程序.
-			Log.i(TAG, "mIsNewIntent = false");
+			if (BuildConfig.DEBUG)
+				Log.i(TAG, "mIsNewIntent = false");
 			initiativeDestroy();
 		}
 	}
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		Log.i(TAG, "onSaveInstanceState");
+		if (BuildConfig.DEBUG)
+			Log.i(TAG, "onSaveInstanceState");
 		outState.putParcelable(ORIGINAL_INTENT, getIntent());
 		outState.putSerializable("DefaultActivityClass", clazz);
 		super.onSaveInstanceState(outState);
