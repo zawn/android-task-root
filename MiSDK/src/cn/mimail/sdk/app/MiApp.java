@@ -15,7 +15,7 @@ public class MiApp extends Application {
 	 * 
 	 * @return 程序需要启动的Activity
 	 */
-	protected static Class<?> getDefaultActivityClass() {
+	public static Class<?> getDefaultActivityClass() {
 		if (mDefaultActivityClass == null) {
 			throw new RuntimeException("Please set a Activity to launch");
 		}
@@ -25,7 +25,7 @@ public class MiApp extends Application {
 	/**
 	 * @param 程序需要启动的第一个Activity
 	 */
-	protected static void setDefaultActivityClass(Class<?> defaultActivityClass) {
+	public static void setDefaultActivityClass(Class<?> defaultActivityClass) {
 		mDefaultActivityClass = defaultActivityClass;
 	}
 
