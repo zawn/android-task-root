@@ -39,18 +39,18 @@ import android.os.Process;
 import cn.mimail.sdk.util.Utils;
 
 /**
- * *************************************
+ * *************************************<br>
  * Copied from JB release framework:
  * https://android.googlesource.com/platform/frameworks/base/+/jb-release/core/java/android/os/AsyncTask.java
  *
  * so that threading behavior on all OS versions is the same and we can tweak behavior by using
- * executeOnExecutor() if needed.
+ * executeOnExecutor() if needed.<br>
  *
- * There are 3 changes in this copy of AsyncTask:
+ * There are 3 changes in this copy of AsyncTask:<br>
  *    -pre-HC a single thread executor is used for serial operation
- *    (Executors.newSingleThreadExecutor) and is the default
- *    -the default THREAD_POOL_EXECUTOR was changed to use DiscardOldestPolicy
- *    -a new fixed thread pool called DUAL_THREAD_EXECUTOR was added
+ *    (Executors.newSingleThreadExecutor) and is the default<br>
+ *    -the default THREAD_POOL_EXECUTOR was changed to use DiscardOldestPolicy<br>
+ *    -a new fixed thread pool called DUAL_THREAD_EXECUTOR was added<br>
  * *************************************
  *
  * <p>AsyncTask enables proper and easy use of the UI thread. This class allows to
