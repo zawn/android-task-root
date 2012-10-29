@@ -57,7 +57,7 @@ public class MiApp extends Application {
 	 * @param profile 要设置的 profile
 	 */
 	public void setProfile(Profile profile) {
-		this.profile = profile;
+		MiApp.profile = profile;
 	}
 
 }
