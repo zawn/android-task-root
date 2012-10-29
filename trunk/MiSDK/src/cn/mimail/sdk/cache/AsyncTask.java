@@ -206,7 +206,7 @@ public abstract class AsyncTask<Params, Progress, Result> {
         private final AtomicInteger mCount = new AtomicInteger(1);
 
         public Thread newThread(Runnable r) {
-            return new Thread(r, "AsyncTask #" + mCount.getAndIncrement());
+            return new Thread(r, "ImageAsyncTask #" + mCount.getAndIncrement());
         }
     };
 
