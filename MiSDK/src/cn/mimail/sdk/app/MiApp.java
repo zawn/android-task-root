@@ -17,7 +17,7 @@ public class MiApp extends Application {
 	 */
 	public static Class<?> getDefaultActivityClass() {
 		if (mDefaultActivityClass == null) {
-			throw new RuntimeException("Please set a Activity to launch");
+			throw new NullPointerException("Please set a Activity to launch");
 		}
 		return mDefaultActivityClass;
 	}
@@ -46,7 +46,7 @@ public class MiApp extends Application {
 	 * @return profile
 	 * @throws Exception
 	 */
-	public static Profile getProfile() throws NullPointerException {
+	public static Profile getProfile() {
 		if (profile == null) {
 			throw new NullPointerException("Context profile is null!!");
 		}
