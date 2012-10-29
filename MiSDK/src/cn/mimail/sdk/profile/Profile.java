@@ -15,25 +15,5 @@ package cn.mimail.sdk.profile;
 public class Profile {
 
 	private static final String TAG = "Profile.java";
-	private static final Class<?> mDefaultActivityClass;
-
-	/**
-	 * 此方法由TaskRoot调用,用于TaskRoot引导默认的Activity
-	 * 
-	 * @return 程序需要启动的Activity
-	 */
-	public static Class<?> getDefaultActivityClass() {
-		if (mDefaultActivityClass == null) {
-			throw new RuntimeException("Please set a Activity to launch");
-		}
-		return mDefaultActivityClass;
-	}
-
-	/**
-	 * @param 程序需要启动的第一个Activity
-	 */
-	public static void setDefaultActivityClass(Class<?> defaultActivityClass) {
-		mDefaultActivityClass = defaultActivityClass;
-	}
 
 }
