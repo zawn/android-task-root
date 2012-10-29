@@ -28,9 +28,8 @@ public abstract class Async<Params, Progress, Result> extends AsyncTask<Params, 
 	/**
 	 * 构造函数
 	 */
-	public Async(Callback callback) {
+	public Async() {
 		super();
-		setCallback(callback);
 	}
 
 	/**
@@ -49,7 +48,7 @@ public abstract class Async<Params, Progress, Result> extends AsyncTask<Params, 
 	 * 
 	 * @return A {@link Callback} instance or null if no callback was set.
 	 * 
-	 * @see #setCallback(android.graphics.drawable.Drawable.Callback)
+	 * @see #setCallback
 	 */
 	public Callback getCallback() {
 		if (mCallback != null) {
@@ -121,19 +120,20 @@ public abstract class Async<Params, Progress, Result> extends AsyncTask<Params, 
 		public <Progress> void onProgressUpdate(Progress... values);
 	}
 
-	@Override
-	protected void onPostExecute(Result result) {
-		final Callback callback = getCallback();
-		if (callback != null) {
-			callback.onPostExecute(result);
-		}
-	}
 
 	@Override
 	protected void onPreExecute() {
 		final Callback callback = getCallback();
 		if (callback != null && (callback instanceof Callback2)) {
 			((Callback2) callback).onPreExecute();
+		}
+	}
+
+	@Override
+	protected void onPostExecute(Result result) {
+		final Callback callback = getCallback();
+		if (callback != null) {
+			callback.onPostExecute(result);
 		}
 	}
 
