@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.mimail.sdk.cache;
+package cn.mimail.sdk.net.image;
 
 import java.lang.ref.WeakReference;
 
@@ -30,6 +30,8 @@ import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.widget.ImageView;
 import cn.mimail.misdk.BuildConfig;
+import cn.mimail.sdk.cache.ImageCache;
+import cn.mimail.sdk.cache.ImageCache.ImageCacheParams;
 
 /**
  * This class wraps up completing some arbitrary long running work when loading a bitmap to an
