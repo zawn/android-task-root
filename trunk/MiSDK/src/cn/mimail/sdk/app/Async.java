@@ -134,22 +134,22 @@ public abstract class Async<Params, Progress, Result> extends AsyncTask<Params, 
 	}
 
 	@Override
-	protected void onPostExecute(Result result) {
-		if (BuildConfig.DEBUG)
-			Log.i(TAG, "onPostExecute");
-		final Callback callback = getCallback();
-		if (callback != null) {
-			callback.onPostExecute(result);
-		}
-	}
-
-	@Override
 	protected void onProgressUpdate(Progress... values) {
 		if (BuildConfig.DEBUG)
 			Log.i(TAG, "onProgressUpdate" + Arrays.toString(values));
 		final Callback callback = getCallback();
 		if (callback != null && (callback instanceof Callback2)) {
 			((Callback2) callback).onProgressUpdate(values);
+		}
+	}
+	
+	@Override
+	protected void onPostExecute(Result result) {
+		if (BuildConfig.DEBUG)
+			Log.i(TAG, "onPostExecute");
+		final Callback callback = getCallback();
+		if (callback != null) {
+			callback.onPostExecute(result);
 		}
 	}
 
