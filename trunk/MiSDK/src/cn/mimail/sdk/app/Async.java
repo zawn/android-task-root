@@ -9,6 +9,10 @@
 package cn.mimail.sdk.app;
 
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
+
+import android.util.Log;
+import cn.mimail.misdk.BuildConfig;
 
 /**
  * 通过回调函数实现后台任务与UI任务的分离
@@ -17,7 +21,6 @@ import java.lang.ref.WeakReference;
  */
 public abstract class Async<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
 
-	@SuppressWarnings("unused")
 	private static final String TAG = "Async.java";
 	private WeakReference<Callback> mCallback = null;
 
@@ -120,9 +123,10 @@ public abstract class Async<Params, Progress, Result> extends AsyncTask<Params, 
 		public <Progress> void onProgressUpdate(Progress... values);
 	}
 
-
 	@Override
 	protected void onPreExecute() {
+		if (BuildConfig.DEBUG)
+			Log.i(TAG, "onPreExecute");
 		final Callback callback = getCallback();
 		if (callback != null && (callback instanceof Callback2)) {
 			((Callback2) callback).onPreExecute();
@@ -131,6 +135,8 @@ public abstract class Async<Params, Progress, Result> extends AsyncTask<Params, 
 
 	@Override
 	protected void onPostExecute(Result result) {
+		if (BuildConfig.DEBUG)
+			Log.i(TAG, "onPostExecute");
 		final Callback callback = getCallback();
 		if (callback != null) {
 			callback.onPostExecute(result);
@@ -139,6 +145,8 @@ public abstract class Async<Params, Progress, Result> extends AsyncTask<Params, 
 
 	@Override
 	protected void onProgressUpdate(Progress... values) {
+		if (BuildConfig.DEBUG)
+			Log.i(TAG, "onProgressUpdate" + Arrays.toString(values));
 		final Callback callback = getCallback();
 		if (callback != null && (callback instanceof Callback2)) {
 			((Callback2) callback).onProgressUpdate(values);
@@ -147,6 +155,8 @@ public abstract class Async<Params, Progress, Result> extends AsyncTask<Params, 
 
 	@Override
 	protected void onCancelled(Result result) {
+		if (BuildConfig.DEBUG)
+			Log.i(TAG, "onCancelled");
 		final Callback callback = getCallback();
 		if (callback != null) {
 			callback.onCancelled(result);
