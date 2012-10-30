@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.mimail.sdk.cache;
+package cn.mimail.sdk.net.image;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -35,6 +35,10 @@ import android.util.Log;
 import android.widget.Toast;
 import cn.mimail.misdk.BuildConfig;
 import cn.mimail.misdk.R;
+import cn.mimail.sdk.cache.DiskLruCache;
+import cn.mimail.sdk.cache.ImageCache;
+import cn.mimail.sdk.cache.DiskLruCache.Editor;
+import cn.mimail.sdk.cache.DiskLruCache.Snapshot;
 
 /**
  * A simple subclass of {@link ImageResizer} that fetches and resizes images fetched from a URL.

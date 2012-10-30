@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.mimail.sdk.cache;
+package cn.mimail.sdk.net.image;
 
 import java.io.FileDescriptor;
 
