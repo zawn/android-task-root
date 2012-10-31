@@ -8,6 +8,7 @@
  */
 package cn.mimail.sdk.net.json;
 
+
 /**
  * 
  * @author ZhangZhenli
