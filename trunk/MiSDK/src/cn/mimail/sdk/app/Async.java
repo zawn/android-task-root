@@ -38,7 +38,8 @@ public abstract class Async<Params, Progress, Result> extends AsyncTask<Params, 
 	/**
 	 * Bind a {@link Callback} object to this Async.
 	 * 
-	 * @param cb The client's Callback implementation.
+	 * @param cb
+	 *            The client's Callback implementation.
 	 * 
 	 * @see #getCallback()
 	 */
@@ -47,7 +48,8 @@ public abstract class Async<Params, Progress, Result> extends AsyncTask<Params, 
 	}
 
 	/**
-	 * Return the current {@link Callback} implementation Callback to this Async.
+	 * Return the current {@link Callback} implementation Callback to this
+	 * Async.
 	 * 
 	 * @return A {@link Callback} instance or null if no callback was set.
 	 * 
@@ -66,14 +68,17 @@ public abstract class Async<Params, Progress, Result> extends AsyncTask<Params, 
 	public static interface Callback {
 		/**
 		 * <p>
-		 * Runs on the UI thread after {@link #doInBackground}. The specified result is the value returned by {@link #doInBackground}.
+		 * Runs on the UI thread after {@link #doInBackground}. The specified
+		 * result is the value returned by {@link #doInBackground}.
 		 * </p>
 		 * 
 		 * <p>
 		 * This method won't be invoked if the task was cancelled.
 		 * </p>
 		 * 
-		 * @param result The result of the operation computed by {@link #doInBackground}.
+		 * @param result
+		 *            The result of the operation computed by
+		 *            {@link #doInBackground}.
 		 * 
 		 * @see #onPreExecute
 		 * @see #doInBackground
@@ -83,15 +88,19 @@ public abstract class Async<Params, Progress, Result> extends AsyncTask<Params, 
 
 		/**
 		 * <p>
-		 * Runs on the UI thread after {@link #cancel(boolean)} is invoked and {@link #doInBackground(Object[])} has finished.
+		 * Runs on the UI thread after {@link #cancel(boolean)} is invoked and
+		 * {@link #doInBackground(Object[])} has finished.
 		 * </p>
 		 * 
 		 * <p>
-		 * The default implementation simply invokes {@link #onCancelled()} and ignores the result. If you write your own implementation, do not call
+		 * The default implementation simply invokes {@link #onCancelled()} and
+		 * ignores the result. If you write your own implementation, do not call
 		 * <code>super.onCancelled(result)</code>.
 		 * </p>
 		 * 
-		 * @param result The result, if any, computed in {@link #doInBackground(Object[])}, can be null
+		 * @param result
+		 *            The result, if any, computed in
+		 *            {@link #doInBackground(Object[])}, can be null
 		 * 
 		 * @see #cancel(boolean)
 		 * @see #isCancelled()
@@ -113,9 +122,11 @@ public abstract class Async<Params, Progress, Result> extends AsyncTask<Params, 
 		public void onPreExecute();
 
 		/**
-		 * Runs on the UI thread after {@link #publishProgress} is invoked. The specified values are the values passed to {@link #publishProgress}.
+		 * Runs on the UI thread after {@link #publishProgress} is invoked. The
+		 * specified values are the values passed to {@link #publishProgress}.
 		 * 
-		 * @param values The values indicating progress.
+		 * @param values
+		 *            The values indicating progress.
 		 * 
 		 * @see #publishProgress
 		 * @see #doInBackground
@@ -124,7 +135,7 @@ public abstract class Async<Params, Progress, Result> extends AsyncTask<Params, 
 	}
 
 	@Override
-	protected void onPreExecute() {
+	protected final void onPreExecute() {
 		if (BuildConfig.DEBUG)
 			Log.i(TAG, "onPreExecute");
 		final Callback callback = getCallback();
@@ -142,13 +153,13 @@ public abstract class Async<Params, Progress, Result> extends AsyncTask<Params, 
 			((Callback2) callback).onProgressUpdate(values);
 		}
 	}
-	
+
 	@Override
 	protected void onPostExecute(Result result) {
 		if (BuildConfig.DEBUG)
 			Log.i(TAG, "onPostExecute");
 		final Callback callback = getCallback();
-		if (callback != null) {
+		if (callback != null && !isCancelled()) {
 			callback.onPostExecute(result);
 		}
 	}
