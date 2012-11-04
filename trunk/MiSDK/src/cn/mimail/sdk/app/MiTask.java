@@ -195,4 +195,16 @@ public final class MiTask extends Activity {
 		intent.putExtra(BUNDLE_DATA, bundle);
 		packageContext.startActivity(intent);
 	}
+
+	/**
+	 * 用于退出任务便捷方法,该方法将销毁任务栈中的所有Activity并退出程序<br>
+	 * 
+	 * @param packageContext A Context of the application package implementing this class.
+	 * @param cls The component class that is to be used for the intent.
+	 * @param bundle To attach to the intent of the parameters
+	 */
+	public static void exitTask(Context packageContext) {
+		switchActivity(packageContext, MiTask.class);
+	}
+
 }
