@@ -34,7 +34,7 @@
 		<link>
 			<name>src</name>
 			<type>2</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/org.eclipse.paho.mqtt.java/org.eclipse.paho.client.mqttv3/src</locationURI>
+			<location>G:/org.eclipse.paho.mqtt.java/org.eclipse.paho.client.mqttv3/src</location>
 		</link>
 	</linkedResources>
 </projectDescription>
