@@ -32,12 +32,12 @@ import java.util.Iterator;
 /**
  * A wrapper for a broadcast receiver that provides network connectivity
  * state information, independent of network type (mobile, Wi-Fi, etc.).
- * @deprecated Code tempted to use this class should simply listen for connectivity intents
+ * Code tempted to use this class should simply listen for connectivity intents
  * (or poll ConnectivityManager) directly.
  */
 public class NetworkConnectivityListener {
     private static final String TAG = "NetworkConnectivityListener";
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     private Context mContext;
     private HashMap<Handler, Integer> mHandlers = new HashMap<Handler, Integer>();
