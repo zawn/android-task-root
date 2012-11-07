@@ -123,8 +123,8 @@ public class PushService extends LoopService implements MqttCallback {
 
 	private void connect() {
 
-		this.brokerUrl = Utils.getBrokerUrl();
-		this.quietMode = Utils.getQuietMode();
+		this.brokerUrl = Mqttv3Utils.getBrokerUrl();
+		this.quietMode = Mqttv3Utils.getQuietMode();
 
 		// This stores files in a cache directory
 		String tmpDir = DiskLruCache.getDiskCacheDir(getApplicationContext(), "13900000000").getPath();
@@ -137,7 +137,7 @@ public class PushService extends LoopService implements MqttCallback {
 			conOpt.setCleanSession(false);
 
 			// Construct the MqttClient instance
-			client = new MqttClient(this.brokerUrl, Utils.getClientId(), dataStore);
+			client = new MqttClient(this.brokerUrl, Mqttv3Utils.getClientId(), dataStore);
 
 			// Set this wrapper as the callback handler
 			client.setCallback(this);
@@ -310,4 +310,6 @@ public class PushService extends LoopService implements MqttCallback {
 			Log.i(TAG, message);
 		}
 	}
+	
+	
 }
