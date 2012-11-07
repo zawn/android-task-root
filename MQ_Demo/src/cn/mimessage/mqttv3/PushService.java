@@ -8,9 +8,6 @@
  */
 package cn.mimessage.mqttv3;
 
-import static android.net.ConnectivityManager.TYPE_MOBILE;
-import static android.net.ConnectivityManager.TYPE_WIFI;
-
 import java.sql.Timestamp;
 
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -23,16 +20,11 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
-import cn.mimessage.and.sdk.cache.image.DiskLruCache;
+import cn.mimail.sdk.util.Utils;
 
 /**
  * 继承{@link LoopService}并实现具体业务逻辑的子类
@@ -60,7 +52,6 @@ public class PushService extends LoopService implements MqttCallback {
 	public void onCreate() {
 		log("onCreate");
 		super.onCreate();
-		registerReceiver(mConnectivityChanged, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 	}
 
 	@Override
@@ -76,12 +67,18 @@ public class PushService extends LoopService implements MqttCallback {
 			e.printStackTrace();
 		}
 		log("Disconnected");
-		unregisterReceiver(mConnectivityChanged);
 	}
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		return super.onBind(intent);
+		log("onBind");
+		return new LocalBinder();
+	}
+
+	public class LocalBinder extends Binder {
+		public PushService getService() {
+			return PushService.this;
+		}
 	}
 
 	@Override
@@ -92,25 +89,25 @@ public class PushService extends LoopService implements MqttCallback {
 		MQMessage message = (MQMessage) intent.getSerializableExtra(MqttIntent.MSG);
 		// Do an appropriate action based on the intent.
 		try {
-			if (a.equals(MqttIntent.CONNECT)) {
+			if (MqttIntent.CONNECT.equals(a)) {
 				log("To establish a connection with the server");
 				connect();
-			} else if (a.equals(MqttIntent.PUBLISH)) {
+			} else if (MqttIntent.PUBLISH.equals(a)) {
 				log("Publish message:" + message.toString());
 				publish(message.getTopicName(), message.getQos(), message.getPayload());
-			} else if (a.equals(MqttIntent.SUBSCRIBE)) {
+			} else if (MqttIntent.SUBSCRIBE.equals(a)) {
 				log("Subscribing to topic:" + message.toString());
 				subscribe(message.getTopicName(), message.getQos());
-			} else if (a.equals(MqttIntent.UNSUBSCRIBE)) {
+			} else if (MqttIntent.UNSUBSCRIBE.equals(a)) {
 				log("Unsubscribe topic:" + message.toString());
 				unSubscribe(message.getTopicName());
-			} else if (a.equals(MqttIntent.KEEPALIVE)) {
+			} else if (MqttIntent.KEEPALIVE.equals(a)) {
 				log("KeepAlive...");
 				keepAlive();
-			} else if (a.equals(MqttIntent.RECONNECT)) {
+			} else if (MqttIntent.RECONNECT.equals(a)) {
 				log("Reconnect...");
 				reConnect();
-			} else if (a.equals(MqttIntent.DISCONNECT)) {
+			} else if (MqttIntent.DISCONNECT.equals(a)) {
 				log("Terminate the connection");
 				stopSelf();
 			}
@@ -127,7 +124,7 @@ public class PushService extends LoopService implements MqttCallback {
 		this.quietMode = Mqttv3Utils.getQuietMode();
 
 		// This stores files in a cache directory
-		String tmpDir = DiskLruCache.getDiskCacheDir(getApplicationContext(), "13900000000").getPath();
+		String tmpDir = Utils.getDiskCacheDir(getApplication(), "13900000000").getPath();
 
 		try {
 			MqttDefaultFilePersistence dataStore = new MqttDefaultFilePersistence(tmpDir);
@@ -181,11 +178,13 @@ public class PushService extends LoopService implements MqttCallback {
 		log("MessageArrived");
 		// Called when a message arrives from the server.
 		String time = new Timestamp(System.currentTimeMillis()).toString();
-		log("Time:\t" + time + "  Topic:\t" + topic.getName() + "  Message:\t" + new String(message.getPayload()) + "  QoS:\t" + message.getQos());
+		log("Time:\t" + time + "  Topic:\t" + topic.getName() + "  Message:\t" + new String(message.getPayload())
+				+ "  QoS:\t" + message.getQos());
 
 		Intent intent = new Intent(getApplicationContext(), MainActivity.class);
 		intent.setAction(MqttIntent.MSGARRIVED);
-		intent.putExtra(MqttIntent.MSG, new MQMessage(topic.getName(), new String(message.getPayload()), message.getQos()));
+		intent.putExtra(MqttIntent.MSG,
+				new MQMessage(topic.getName(), new String(message.getPayload()), message.getQos()));
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		startActivity(intent);
@@ -247,55 +246,6 @@ public class PushService extends LoopService implements MqttCallback {
 		client.unsubscribe(topicName);
 	}
 
-	/**
-	 * This receiver listeners for network changes and updates the MQTT connection accordingly
-	 */
-	private BroadcastReceiver mConnectivityChanged = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			log(intent.getAction());
-			final ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-			final NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-			if (networkInfo != null) {
-				if (networkInfo.isConnected()) {
-					log("Connectivity changed: networkInfo is not Null and isConnected");
-				} else if (networkInfo.isConnectedOrConnecting()) {
-					log("Connectivity changed: networkInfo is not Null and isConnectedOrConnecting");
-				} else {
-					log("Connectivity changed: networkInfo is not Null");
-				}
-			} else {
-				log("Connectivity changed: networkInfo is Null");
-			}
-
-			if (networkInfo == null || !networkInfo.isConnectedOrConnecting()) {
-				Toast.makeText(context, "No network connection found.", Toast.LENGTH_LONG).show();
-				Log.e(TAG, "checkConnection - no connection found");
-				// 没有可用网络,关闭连接
-				try {
-					client.disconnect();
-				} catch (MqttException e) {
-					e.printStackTrace();
-				}
-			} else {
-
-			}
-			if (networkInfo != null) {
-				// err on side of caution
-				final int type = networkInfo.getType();
-				log("networkInfo.getType()" + networkInfo.getType() + "   " + networkInfo.getTypeName());
-				switch (type) {
-				case TYPE_MOBILE:
-				case TYPE_WIFI:
-				default:
-					// err on side of caution
-				}
-			}
-
-		}
-
-	};
-
 	private void reConnectIfNecessary() {
 		log("reConnectIfNecessary");
 	}
@@ -310,6 +260,5 @@ public class PushService extends LoopService implements MqttCallback {
 			Log.i(TAG, message);
 		}
 	}
-	
-	
+
 }
