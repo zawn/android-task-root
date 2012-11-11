@@ -30,6 +30,23 @@
             android:name=".PushService"
             android:label="MQTTv3 Background Service" >
         </service>
+        <service
+            android:name=".TestService"
+            android:process=":zhang"
+            android:exported="true"
+            android:label="MQTTv3 Background Service" >
+        </service>
+
+        <receiver
+            android:name=".MQConnectivityReceiver"
+            android:exported="true"
+            android:label="监听网络变化" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
