@@ -45,27 +45,95 @@ public class Utils {
 	/**
 	 * Get a usable cache directory (external if available, internal otherwise).
 	 * 
-	 * @param context
-	 *            The context to use
-	 * @param uniqueName
-	 *            A unique directory name to append to the cache dir
+	 * @param context The context to use
+	 * @param uniqueName A unique directory name to append to the cache dir
 	 * @return The cache dir
 	 */
 	public static File getDiskCacheDir(Context context, String uniqueName) {
 		// Check if media is mounted or storage is built-in, if so, try and use
 		// external cache dir
 		// otherwise use internal cache dir
-		final String cachePath = Environment.MEDIA_MOUNTED.equals(Environment
-				.getExternalStorageState()) || !isExternalStorageRemovable() ? getExternalCacheDir(
-				context).getPath()
-				: context.getCacheDir().getPath();
-
-		return new File(cachePath + File.separator + uniqueName);
+		final String cachePath = Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+				|| !isExternalStorageRemovable() ? getExternalCacheDir(context).getPath() : context.getCacheDir()
+				.getPath();
+		final File dir = new File(cachePath + File.separator + uniqueName);
+		if (dir.exists()) {
+			if (!dir.isDirectory()) {
+				dir.delete();
+			} else {
+				return dir;
+			}
+		} else {
+			dir.mkdirs();
+		}
+		return dir;
 	}
 
 	/**
-	 * A hashing method that changes a string (like a URL) into a hash suitable
-	 * for using as a disk filename.
+	 * Get a usable cache directory (external if available, internal otherwise).
+	 * 
+	 * @param context The context to use
+	 * @param uniqueName A unique directory name to append to the cache dir
+	 * @return The cache dir
+	 */
+	public static File getDiskCacheDir(Context context) {
+		// Check if media is mounted or storage is built-in, if so, try and use
+		// external cache dir
+		// otherwise use internal cache dir
+		final String cachePath = Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+				|| !isExternalStorageRemovable() ? getExternalCacheDir(context).getPath() : context.getCacheDir()
+				.getPath();
+
+		return new File(cachePath);
+	}
+
+	/**
+	 * Get a usable cache directory (external if available, internal otherwise).
+	 * 
+	 * @param context The context to use
+	 * @param uniqueName A unique directory name to append to the cache dir
+	 * @return The cache dir
+	 */
+	public static File getDiskFilesDir(Context context, String uniqueName) {
+		// Check if media is mounted or storage is built-in, if so, try and use
+		// external cache dir
+		// otherwise use internal cache dir
+		final String cachePath = Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+				|| !isExternalStorageRemovable() ? getExternalFilesDir(context).getPath() : context.getFilesDir()
+				.getPath();
+
+		final File dir = new File(cachePath + File.separator + uniqueName);
+		if (dir.exists()) {
+			if (!dir.isDirectory()) {
+				dir.delete();
+			} else {
+				return dir;
+			}
+		} else {
+			dir.mkdirs();
+		}
+		return dir;
+	}
+
+	/**
+	 * Get a usable cache directory (external if available, internal otherwise).
+	 * 
+	 * @param context The context to use
+	 * @param uniqueName A unique directory name to append to the cache dir
+	 * @return The cache dir
+	 */
+	public static File getDiskFilesDir(Context context) {
+		// Check if media is mounted or storage is built-in, if so, try and use
+		// external cache dir
+		// otherwise use internal cache dir
+		final String cachePath = Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+				|| !isExternalStorageRemovable() ? getExternalFilesDir(context).getPath() : context.getFilesDir()
+				.getPath();
+		return new File(cachePath);
+	}
+
+	/**
+	 * A hashing method that changes a string (like a URL) into a hash suitable for using as a disk filename.
 	 */
 	public static String hashKeyForDisk(String key) {
 		String cacheKey;
@@ -110,8 +178,7 @@ public class Utils {
 	/**
 	 * Check if external storage is built-in or removable.
 	 * 
-	 * @return True if external storage is removable (like an SD card), false
-	 *         otherwise.
+	 * @return True if external storage is removable (like an SD card), false otherwise.
 	 */
 	@TargetApi(9)
 	public static boolean isExternalStorageRemovable() {
@@ -124,28 +191,41 @@ public class Utils {
 	/**
 	 * Get the external app cache directory.
 	 * 
-	 * @param context
-	 *            The context to use
+	 * @param context The context to use
 	 * @return The external cache dir
 	 */
 	@TargetApi(8)
-	public static File getExternalCacheDir(Context context) {
+	private static File getExternalCacheDir(Context context) {
 		if (Utils.hasFroyo()) {
 			return context.getExternalCacheDir();
 		}
 
 		// Before Froyo we need to construct the external cache dir ourselves
-		final String cacheDir = "/Android/data/" + context.getPackageName()
-				+ "/cache/";
-		return new File(Environment.getExternalStorageDirectory().getPath()
-				+ cacheDir);
+		final String cacheDir = "/Android/data/" + context.getPackageName() + "/cache/";
+		return new File(Environment.getExternalStorageDirectory().getPath() + cacheDir);
+	}
+
+	/**
+	 * Get the external app cache directory.
+	 * 
+	 * @param context The context to use
+	 * @return The external cache dir
+	 */
+	@TargetApi(8)
+	private static File getExternalFilesDir(Context context) {
+		if (Utils.hasFroyo()) {
+			return context.getExternalFilesDir(null);
+		}
+
+		// Before Froyo we need to construct the external cache dir ourselves
+		final String cacheDir = "/Android/data/" + context.getPackageName() + "/files/";
+		return new File(Environment.getExternalStorageDirectory().getPath() + cacheDir);
 	}
 
 	/**
 	 * Check how much usable space is available at a given path.
 	 * 
-	 * @param path
-	 *            The path to check
+	 * @param path The path to check
 	 * @return The space available in bytes
 	 */
 	@TargetApi(9)
