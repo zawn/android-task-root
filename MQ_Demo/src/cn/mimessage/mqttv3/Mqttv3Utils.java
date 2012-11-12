@@ -48,7 +48,7 @@ public class Mqttv3Utils {
 	}
 
 	public static String getBrokerUrl() {
-		String broker = "192.168.1.2";
+		String broker = "42.121.4.114";
 		int port = 1883;
 		return "tcp://" + broker + ":" + port;
 	}
