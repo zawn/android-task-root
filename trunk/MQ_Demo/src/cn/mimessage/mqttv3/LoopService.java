@@ -76,7 +76,7 @@ public abstract class LoopService extends Service {
 		// method that would launch the service & hand off a wakelock.
 
 		super.onCreate();
-		HandlerThread thread = new HandlerThread("IntentService[" + mName + "]");
+		HandlerThread thread = new HandlerThread("LoopService[" + mName + "]");
 		thread.start();
 
 		mServiceLooper = thread.getLooper();
