@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="build" name="MQTTv3">
+    <property environment="env"/>
+    <property name="src.link" value="../../git/org.eclipse.paho.mqtt.java/org.eclipse.paho.client.mqttv3/src"/>
+    <property name="trace.link" value="../../git/org.eclipse.paho.mqtt.java/org.eclipse.paho.client.mqttv3.internal.traceformat/src"/>
+    <property name="out" value="bin/temp"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.5"/>
+    <property name="source" value="1.5"/>
+    <path id="Android 4.1.libraryclasspath">
+        <pathelement location="D:/Android/android-sdk-windows/platforms/android-16/android.jar"/>
+    </path>
+    <path id="Android Dependencies.libraryclasspath"/>
+    <path id="MQTTv3.classpath">
+        <pathelement path="${out}/bin"/>
+        <path refid="Android 4.1.libraryclasspath"/>
+        <path refid="Android Dependencies.libraryclasspath"/>
+    </path>
+    <target name="init">
+        <mkdir dir="${out}/bin"/>
+        <mkdir dir="${out}/src"/>
+        <echo message="初始化环境..."/>
+        <mkdir dir="${src.link}/org/eclipse/paho/client/mqttv3/internal/traceformat"/>
+        <copy includeemptydirs="false" todir="${src.link}">
+            <fileset dir="${trace.link}">
+                <include name="**/TraceFormatter.java"/>
+            </fileset>
+        </copy>
+        <copy includeemptydirs="false" todir="${out}/src">
+            <fileset dir="${trace.link}"/>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="${out}"/>
+        <delete dir="${src.link}/org/eclipse/paho/client/mqttv3/internal/traceformat"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target name="code-pretreatment" depends="init" description="编译前预处理代码">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <echo message="编译处理程序..."/>
+  		<javac debug="true" debuglevel="${debuglevel}" destdir="${out}/bin" source="${source}" target="${target}" includeantruntime="false">
+            <src path="${out}/src"/>
+            <include name="**/TracePointExtractor.java"/>
+            <classpath refid="MQTTv3.classpath"/>
+        </javac>
+        <java classname="org.eclipse.paho.client.mqttv3.internal.traceformat.TracePointExtractor">
+         	<arg value="-d"/>
+         	<arg value="${src.link}"/>
+         	<arg value="-o"/>
+         	<arg value="${src.link}/org/eclipse/paho/client/mqttv3/internal/traceformat/trace.properties"/>
+         	<classpath refid="MQTTv3.classpath"/>
+       </java>
+       <echo message="编译处理完毕..."/>
+    </target>
+    <target depends="code-pretreatment" name="build"/>
+</project>
