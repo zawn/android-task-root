@@ -1,5 +1,5 @@
 /*
- * Name   MQMessage.java
+ * Name   PushMessage.java
  * Author ZhangZhenli
  * Created on 2012-10-8, 下午8:19:22
  *
@@ -9,98 +9,95 @@
 package cn.mimessage.mqttv3;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 /**
  * 
  * @author ZhangZhenli
  */
-public class MQMessage implements Serializable {
+public class PushMessage extends MqttMessage implements Serializable {
 
 	private static final long serialVersionUID = 708456467437832908L;
 	private String topicName;
-	private int qos;
-	private byte[] payload;
+
 	/**
 	 * @param topic
 	 */
-	public MQMessage(String topicName) {
+	public PushMessage(String topicName) {
 		this.topicName = topicName;
 	}
+
 	/**
 	 * @param topic
 	 * @param content
 	 */
-	public MQMessage(String topic, String content) {
+	public PushMessage(String topic, String content) {
 		this(topic);
-		this.payload = content.getBytes();
+		try {
+			this.setPayload(content.getBytes("UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 	}
+
 	/**
 	 * @param name
 	 * @param string
 	 * @param qos2
 	 */
-	public MQMessage(String topic, String content, int qos) {
+	public PushMessage(String topic, String content, int qos) {
 		this(topic, content);
-		this.qos = qos;
+		this.setQos(qos);
 	}
+
 	/**
 	 * @return topicName
 	 */
 	public String getTopicName() {
 		return topicName;
 	}
+
 	/**
 	 * @param topicName 要设置的 topicName
 	 */
 	public void setTopicName(String topicName) {
 		this.topicName = topicName;
 	}
-	/**
-	 * @return qos
-	 */
-	public int getQos() {
-		return qos;
-	}
-	/**
-	 * @param qos 要设置的 qos
-	 */
-	public void setQos(int qos) {
-		this.qos = qos;
-	}
-	/**
-	 * @return payload
-	 */
+
+	@Override
 	public byte[] getPayload() {
-		return payload;
+		try {
+			return super.getPayload();
+		} catch (MqttException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
-	/**
-	 * @param payload 要设置的 payload
-	 */
-	public void setPayload(byte[] payload) {
-		this.payload = payload;
+
+	public String getPayloadString() {
+		try {
+			return new String(getPayload(), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
-	/**
-	 * @param payload 要设置的 payload
-	 */
-	public void setPayload(String payload) {
-		this.payload = payload.getBytes();
-	}
-	/*
-	 * @see java.lang.Object#hashCode()
-	 */
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + Arrays.hashCode(payload);
-		result = prime * result + qos;
+		result = prime * result + Arrays.hashCode(getPayload());
+		result = prime * result + getQos();
+		result = prime * result + (isRetained() ? 1231 : 1237);
 		result = prime * result + ((topicName == null) ? 0 : topicName.hashCode());
 		return result;
 	}
-	/*
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -109,10 +106,12 @@ public class MQMessage implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		MQMessage other = (MQMessage) obj;
-		if (!Arrays.equals(payload, other.payload))
+		PushMessage other = (PushMessage) obj;
+		if (!Arrays.equals(getPayload(), other.getPayload()))
 			return false;
-		if (qos != other.qos)
+		if (getQos() != other.getQos())
+			return false;
+		if (isRetained() != other.isRetained())
 			return false;
 		if (topicName == null) {
 			if (other.topicName != null)
@@ -121,13 +120,11 @@ public class MQMessage implements Serializable {
 			return false;
 		return true;
 	}
-	/*
-	 * @see java.lang.Object#toString()
-	 */
+
 	@Override
 	public String toString() {
-		return "MQMessage [\n topicName=" + topicName + ",\n qos=" + qos + ",\n payload=" + Arrays.toString(payload) + "]";
+		return "PushMessage [topicName=" + topicName + ", getPayload()=" + Arrays.toString(getPayload())
+				+ ", isRetained()=" + isRetained() + ", getQos()=" + getQos() + "]";
 	}
-	
-	
+
 }
