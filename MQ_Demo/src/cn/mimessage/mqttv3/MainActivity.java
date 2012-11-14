@@ -64,7 +64,7 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				Log.i(TAG, "订阅主题");
 				String topic = mTopicName.getText().toString();
-				toPushServer(MqttIntent.SUBSCRIBE, new MQMessage(topic));
+				toPushServer(MqttIntent.SUBSCRIBE, new PushMessage(topic));
 			}
 		});
 		mUnSubBtn.setOnClickListener(new OnClickListener() {
@@ -73,7 +73,7 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				Log.i(TAG, "退订主题");
 				String topic = mTopicName.getText().toString();
-				toPushServer(MqttIntent.UNSUBSCRIBE, new MQMessage(topic));
+				toPushServer(MqttIntent.UNSUBSCRIBE, new PushMessage(topic));
 			}
 		});
 		mPubBtn.setOnClickListener(new OnClickListener() {
@@ -83,7 +83,7 @@ public class MainActivity extends Activity {
 				Log.i(TAG, "发布消息");
 				String topic = mTopic.getText().toString();
 				String msg = mContent.getText().toString();
-				toPushServer(MqttIntent.PUBLISH, new MQMessage(topic, msg));
+				toPushServer(MqttIntent.PUBLISH, new PushMessage(topic, msg));
 			}
 		});
 
@@ -93,7 +93,7 @@ public class MainActivity extends Activity {
 	protected void onNewIntent(Intent intent) {
 		Log.i(TAG, "onNewIntent action=" + intent.getAction());
 		if (intent.getAction().equals(MqttIntent.MSGARRIVED)) {
-			MQMessage message = (MQMessage) intent.getSerializableExtra(MqttIntent.MSG);
+			PushMessage message = (PushMessage) intent.getSerializableExtra(MqttIntent.MSG);
 			String t = mMsg.getText().toString();
 			StringBuilder sb = new StringBuilder();
 			sb.append(t);
@@ -123,7 +123,7 @@ public class MainActivity extends Activity {
 		startService(intent);
 	}
 
-	private void toPushServer(String action, MQMessage message) {
+	private void toPushServer(String action, PushMessage message) {
 		Log.i(TAG, "toPushServer action=" + action + "  " + message.toString());
 		Intent intent = new Intent(action);
 		intent.setClass(getApplicationContext(), PushService.class);

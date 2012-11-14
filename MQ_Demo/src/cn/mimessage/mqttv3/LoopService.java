@@ -37,7 +37,7 @@ public abstract class LoopService extends Service {
 
 		@Override
 		public void handleMessage(Message msg) {
-			onHandleIntent((Intent) msg.obj);
+			handleNewIntent((Intent) msg.obj);
 			// 处理完消息后不自动退出
 			// stopSelf(msg.arg1);
 		}
@@ -58,7 +58,7 @@ public abstract class LoopService extends Service {
 	 * 
 	 * <p>
 	 * If enabled is true, {@link #onStartCommand(Intent, int, int)} will return {@link Service#START_REDELIVER_INTENT}, so if this process dies
-	 * before {@link #onHandleIntent(Intent)} returns, the process will be restarted and the intent redelivered. If multiple Intents have been sent,
+	 * before {@link #handleNewIntent(Intent)} returns, the process will be restarted and the intent redelivered. If multiple Intents have been sent,
 	 * only the most recent one is guaranteed to be redelivered.
 	 * 
 	 * <p>
@@ -126,5 +126,5 @@ public abstract class LoopService extends Service {
 	 * 
 	 * @param intent The value passed to {@link android.content.Context#startService(Intent)}.
 	 */
-	protected abstract void onHandleIntent(Intent intent);
+	protected abstract void handleNewIntent(Intent intent);
 }
