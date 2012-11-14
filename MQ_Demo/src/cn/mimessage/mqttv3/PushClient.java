@@ -103,7 +103,7 @@ public class PushClient extends MqttClient {
 		// such as cleansession and LWAT
 		mConnectOptions = new MqttConnectOptions();
 		mConnectOptions.setCleanSession(false);
-
+		mConnectOptions.setKeepAliveInterval(60);
 		mCallback = new PushCallback(context);
 		mClientId = Mqttv3Utils.getClientId();
 
@@ -129,6 +129,9 @@ public class PushClient extends MqttClient {
 	@Override
 	public void connect() throws MqttSecurityException, MqttException {
 		Log.i(TAG, "Connected to " + mServerURI + " with client ID " + mClientId);
+		if (this.isConnected()) {
+			this.disconnect();
+		}
 		this.connect(mConnectOptions);
 	}
 
