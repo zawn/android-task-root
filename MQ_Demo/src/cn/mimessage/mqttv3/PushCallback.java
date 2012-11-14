@@ -35,6 +35,9 @@ public class PushCallback implements MqttCallback {
 	@Override
 	public void connectionLost(Throwable cause) {
 		Log.e(TAG, "connectionLost");
+		cause.printStackTrace();
+		// TODO:合理连接丢失重试机制
+		
 	}
 
 	@Override
