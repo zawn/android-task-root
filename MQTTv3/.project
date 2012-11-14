@@ -6,6 +6,16 @@
 	</projects>
 	<buildSpec>
 		<buildCommand>
+			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
+			<triggers>full,incremental,</triggers>
+			<arguments>
+				<dictionary>
+					<key>LaunchConfigHandle</key>
+					<value>&lt;project&gt;/.externalToolBuilders/MQTTv3 build.xml [构建器].launch</value>
+				</dictionary>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
 			<name>com.android.ide.eclipse.adt.ResourceManagerBuilder</name>
 			<arguments>
 			</arguments>
@@ -34,7 +44,12 @@
 		<link>
 			<name>src</name>
 			<type>2</type>
-			<location>G:/org.eclipse.paho.mqtt.java/org.eclipse.paho.client.mqttv3/src</location>
+			<location>G:/git/org.eclipse.paho.mqtt.java/org.eclipse.paho.client.mqttv3/src</location>
+		</link>
+		<link>
+			<name>trace</name>
+			<type>2</type>
+			<location>G:/git/org.eclipse.paho.mqtt.java/org.eclipse.paho.client.mqttv3.internal.traceformat/src</location>
 		</link>
 	</linkedResources>
 </projectDescription>
