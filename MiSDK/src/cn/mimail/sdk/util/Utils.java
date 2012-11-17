@@ -3,8 +3,12 @@ package cn.mimail.sdk.util;
 import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import android.annotation.TargetApi;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningTaskInfo;
+import android.content.ComponentName;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
@@ -236,5 +240,44 @@ public class Utils {
 		final StatFs stats = new StatFs(path.getPath());
 		return (long) stats.getBlockSize() * (long) stats.getAvailableBlocks();
 	}
-
+	
+	/**
+	 * 判断content给定的程序是否处于前台<br />
+	 * 注意:运行此方法需要<br />
+	 * &lt;uses-permission android:name="android.permission.GET_TASKS" /&gt;权限
+	 * 
+	 * @param context
+	 * @return true:程序处于前台运行,false:Activity未处于前台状态
+	 */
+	public static boolean isApplicationForeground(final Context context) {
+		ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+		List<RunningTaskInfo> tasks = am.getRunningTasks(1);
+		if (!tasks.isEmpty()) {
+			ComponentName topActivity = tasks.get(0).topActivity;
+			if (topActivity.getPackageName().equals(context.getPackageName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * 判断cls给定Activity的是否处于前台<br />
+	 * 注意:运行此方法需要<br />
+	 * &lt;uses-permission android:name="android.permission.GET_TASKS" /&gt;权限
+	 * 
+	 * @param context
+	 * @return true:Activity处于前台运行,false:Activity未处于前台状态
+	 */
+	public static boolean isActivityForeground(final Context context,Class<?> cls) {
+		ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+		List<RunningTaskInfo> tasks = am.getRunningTasks(1);
+		if (!tasks.isEmpty()) {
+			ComponentName topActivity = tasks.get(0).topActivity;
+			if (topActivity.getClassName().equals(cls.getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
