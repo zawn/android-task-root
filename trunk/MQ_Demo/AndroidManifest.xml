@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -18,12 +19,19 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
-            android:label="@string/title_activity_main" >
+            android:label="@string/title_activity_main"
+            android:parentActivityName=".MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".RootActivity" />
+        </activity>
+        <activity android:name=".RootActivity" >
         </activity>
 
         <service
@@ -32,9 +40,9 @@
         </service>
         <service
             android:name=".TestService"
-            android:process=":zhang"
             android:exported="true"
-            android:label="MQTTv3 Background Service" >
+            android:label="MQTTv3 Background Service"
+            android:process=":zhang" >
         </service>
 
         <receiver
