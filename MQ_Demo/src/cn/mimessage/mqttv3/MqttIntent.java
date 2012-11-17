@@ -24,4 +24,5 @@ public class MqttIntent {
 	public static final String CONNECT_CHANGE 		= "cn.mimessage.mqttv3.CONNECT_CHANGE";
 	public static final String MSG 					= "cn.mimessage.mqttv3.MqttMessage";
 	public static final String MSGARRIVED 			= "cn.mimessage.mqttv3.MqttMessageArrived";
+	public static final String CONNECT_LOST 		= "cn.mimessage.mqttv3.CONNECT_LOST";
 }

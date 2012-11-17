@@ -30,7 +30,7 @@ public class PushService extends LoopService {
 
 	private static final String TAG = "PushService";
 	private PushClient mClient;
-	private final Timer timer = new Timer();
+	private final Timer timer = new Timer("Push Service Connect Change");
 	private RealHandlerConnectChange connectTimeTask;
 	private final Object timeTaskLock = new Object();
 
@@ -94,6 +94,9 @@ public class PushService extends LoopService {
 				stopSelf();
 			} else if (MqttIntent.CONNECT_CHANGE.equals(a)) {
 				log("connect_change");
+				handlerConnectChange();
+			} else if (MqttIntent.CONNECT_LOST.equals(a)) {
+				log("CONNECT_LOST");
 				handlerConnectChange();
 			} else {
 				if (BuildConfig.DEBUG) {

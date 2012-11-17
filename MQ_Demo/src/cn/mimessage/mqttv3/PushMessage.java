@@ -44,6 +44,10 @@ public class PushMessage extends MqttMessage implements Serializable {
 		}
 	}
 
+	public PushMessage(String topicName, MqttMessage message) throws MqttException {
+		this(topicName, message.getPayload(), message.getQos());
+	}
+
 	/**
 	 * @param name
 	 * @param string
@@ -52,6 +56,25 @@ public class PushMessage extends MqttMessage implements Serializable {
 	public PushMessage(String topic, String content, int qos) {
 		this(topic, content);
 		this.setQos(qos);
+	}
+
+	/**
+	 * @param topicName2
+	 * @param payload
+	 * @param qos
+	 */
+	public PushMessage(String topicName, byte[] payload, int qos) {
+		this(topicName, payload);
+		this.setQos(qos);
+	}
+
+	/**
+	 * @param topicName2
+	 * @param payload
+	 */
+	public PushMessage(String topicName, byte[] payload) {
+		this(topicName);
+		this.setPayload(payload);
 	}
 
 	/**
