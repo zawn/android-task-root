@@ -1,7 +1,9 @@
 package cn.mimessage.mqttv3;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -26,10 +28,13 @@ public class MainActivity extends Activity {
 	private Button mUnSubBtn;
 	private Button mDisConnectBtn;
 	private Button mConnectBtn;
+	
+	private static boolean mIsNewIntent;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.i(TAG, "MainActivity.onCreate()");
 		setContentView(R.layout.activity_main);
 		mConnectBtn = (Button) findViewById(R.id.connectBtn);
 
@@ -86,28 +91,64 @@ public class MainActivity extends Activity {
 				toPushServer(PushIntent.PUBLISH, new PushMessage(topic, msg));
 			}
 		});
+		
+		if (savedInstanceState != null) {
+			// 在低内存的情况下Activity将被销毁,销毁后下面两种操作将触发此条件
+			// 1,用户按返回键重新返回当前Activity,此时程序应该自动退出.
+			// 2,程序通过Intent启动该Activity.
+			mIsNewIntent = false;
+		} else {
+			// 新的TaskRoot实例,是第一次接收到该Intent,所以置位为true
+			mIsNewIntent = true;
+			// 这是一个新的TaskRoot实例,执行默认的操作
+			final Intent intent = getIntent();
+			intentHandler(intent);
+		}
 
 	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		if (BuildConfig.DEBUG)
+			Log.i(TAG, "onSaveInstanceState");
+		outState.putSerializable("Mark", "Mark This is an instance already exists");
+		super.onSaveInstanceState(outState);
+	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void onNewIntent(Intent intent) {
 		Log.i(TAG, "onNewIntent action=" + intent.getAction());
+		mIsNewIntent = true;
+		setIntent(intent);
+		intentHandler(intent);
+	}
+
+	/**
+	 * @param intent
+	 */
+	private void intentHandler(Intent intent) {
 		if (intent.getAction().equals(PushIntent.MESSAGE_ARRIVED)) {
-			PushMessage message = (PushMessage) intent.getSerializableExtra(PushIntent.MESSAGE);
-			String t = mMsg.getText().toString();
-			StringBuilder sb = new StringBuilder();
-			sb.append(t);
-			sb.append("主题：");
-			sb.append(message.getTopicName());
-			sb.append("\n时间：");
-			sb.append((new SimpleDateFormat("yyyy-MM-dd HH:mm")).format(new Date()).toString());
-			sb.append("\nQoS：");
-			sb.append(message.getQos());
-			sb.append("\n消息：\n    ");
-			sb.append(new String(message.getPayload()));
-			sb.append("\n------------------------------\n");
-			mMsg.setText(sb.toString());
+			ArrayList<PushMessage> messages = (ArrayList<PushMessage>) intent.getSerializableExtra(PushIntent.MESSAGE);
+			for (Iterator iterator = messages.iterator(); iterator.hasNext();) {
+				PushMessage message = (PushMessage) iterator.next();
+				String t = mMsg.getText().toString();
+				StringBuilder sb = new StringBuilder();
+				sb.append(t);
+				sb.append("主题：");
+				sb.append(message.getTopicName());
+				sb.append("\n时间：");
+				sb.append((new SimpleDateFormat("yyyy-MM-dd HH:mm")).format(new Date()).toString());
+				sb.append("\nQoS：");
+				sb.append(message.getQos());
+				sb.append("\n消息：\n    ");
+				sb.append(new String(message.getPayload()));
+				sb.append("\n------------------------------\n");
+				mMsg.setText(sb.toString());
+				
+			}
 		}
+		
 	}
 
 	@Override
