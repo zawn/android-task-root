@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Log.i(TAG, "启动服务");
-				toPushServer(MqttIntent.CONNECT);
+				toPushServer(PushIntent.CONNECT);
 			}
 		});
 		mDisConnectBtn = (Button) findViewById(R.id.disConnectBtn);
@@ -47,7 +47,7 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Log.i(TAG, "关闭服务");
-				toPushServer(MqttIntent.DISCONNECT);
+				toPushServer(PushIntent.DISCONNECT);
 			}
 		});
 		mTopic = (EditText) findViewById(R.id.topic);
@@ -64,7 +64,7 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				Log.i(TAG, "订阅主题");
 				String topic = mTopicName.getText().toString();
-				toPushServer(MqttIntent.SUBSCRIBE, new PushMessage(topic));
+				toPushServer(PushIntent.SUBSCRIBE, new PushMessage(topic));
 			}
 		});
 		mUnSubBtn.setOnClickListener(new OnClickListener() {
@@ -73,7 +73,7 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				Log.i(TAG, "退订主题");
 				String topic = mTopicName.getText().toString();
-				toPushServer(MqttIntent.UNSUBSCRIBE, new PushMessage(topic));
+				toPushServer(PushIntent.UNSUBSCRIBE, new PushMessage(topic));
 			}
 		});
 		mPubBtn.setOnClickListener(new OnClickListener() {
@@ -83,7 +83,7 @@ public class MainActivity extends Activity {
 				Log.i(TAG, "发布消息");
 				String topic = mTopic.getText().toString();
 				String msg = mContent.getText().toString();
-				toPushServer(MqttIntent.PUBLISH, new PushMessage(topic, msg));
+				toPushServer(PushIntent.PUBLISH, new PushMessage(topic, msg));
 			}
 		});
 
@@ -92,8 +92,8 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onNewIntent(Intent intent) {
 		Log.i(TAG, "onNewIntent action=" + intent.getAction());
-		if (intent.getAction().equals(MqttIntent.MSGARRIVED)) {
-			PushMessage message = (PushMessage) intent.getSerializableExtra(MqttIntent.MSG);
+		if (intent.getAction().equals(PushIntent.MESSAGE_ARRIVED)) {
+			PushMessage message = (PushMessage) intent.getSerializableExtra(PushIntent.MESSAGE);
 			String t = mMsg.getText().toString();
 			StringBuilder sb = new StringBuilder();
 			sb.append(t);
@@ -119,15 +119,15 @@ public class MainActivity extends Activity {
 	private void toPushServer(String action) {
 		Log.i(TAG, "toPushServer action=" + action);
 		Intent intent = new Intent(action);
-		intent.setClass(getApplicationContext(), PushService.class);
+		intent.setClass(getApplicationContext(), Push.class);
 		startService(intent);
 	}
 
 	private void toPushServer(String action, PushMessage message) {
 		Log.i(TAG, "toPushServer action=" + action + "  " + message.toString());
 		Intent intent = new Intent(action);
-		intent.setClass(getApplicationContext(), PushService.class);
-		intent.putExtra(MqttIntent.MSG, message);
+		intent.setClass(getApplicationContext(), Push.class);
+		intent.putExtra(PushIntent.MESSAGE, message);
 		startService(intent);
 	}
 }

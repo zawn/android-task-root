@@ -23,30 +23,35 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
+import cn.mimail.sdk.util.Utils;
 
 /**
  * 
  * @author ZhangZhenli
  */
-public class PushCallback implements MqttCallback {
+public abstract class PushCallback implements MqttCallback {
 
 	private static final String TAG = "PushCallback.java";
 	private Context mContext;
-	private NotificationManager mNotifMan;
 	private NotificationManager mNotificationManager;
+	private Class<?> mServerClazz;
 	private static int mMessagesNumber;
 	private static NotificationCompat.Builder mNotifyBuilder;
 	private static final int notifyID = 1;
-	// Notification title
-	public static String NOTIF_TITLE = "MQTTv3";
 
-	public PushCallback(Context context) {
+	/**
+	 * 构造函数
+	 * @param context 应用程序上下文
+	 * @param serverCls 具体的服务类
+	 */
+	public PushCallback(Context context, Class<?> serverCls) {
 		this.mContext = context;
 		mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 		// Sets an ID for the notification, so it can be updated
 
 		mNotifyBuilder = new NotificationCompat.Builder(mContext).setSmallIcon(R.drawable.ic_launcher)
 				.setAutoCancel(true).setDefaults(Notification.DEFAULT_ALL).setWhen(System.currentTimeMillis());
+		mServerClazz = serverCls;
 	}
 
 	@Override
@@ -55,8 +60,8 @@ public class PushCallback implements MqttCallback {
 		Log.e(TAG, "connectionLost");
 		cause.printStackTrace();
 		// TODO:合理连接丢失重试机制
-		final Intent service = new Intent(mContext, PushService.class);
-		service.setAction(MqttIntent.CONNECT_LOST);
+		final Intent service = new Intent(mContext, mServerClazz);
+		service.setAction(PushIntent.CONNECT_LOST);
 		mContext.startService(service);
 	}
 
@@ -70,7 +75,17 @@ public class PushCallback implements MqttCallback {
 
 		// New Message Arrived Handler
 		PushMessage pushMessage = new PushMessage(topic.getName(), message);
-		showNotification(pushMessage);
+		if (Utils.isActivityForeground(mContext, getStartActivity())) {
+			Log.i(TAG, "Utils.isActivityForeground(mContext, MainActivity.class)");
+			Intent intent = new Intent(mContext, getStartActivity());
+			intent.setAction(PushIntent.MESSAGE_ARRIVED);
+			intent.putExtra(PushIntent.MESSAGE, pushMessage);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+			mContext.startActivity(intent);
+		} else {
+			showNotification(pushMessage);
+		}
 		Log.i(TAG, "MessageArrived End");
 	}
 
@@ -80,27 +95,21 @@ public class PushCallback implements MqttCallback {
 	}
 
 	// Display the topbar notification
-	@SuppressWarnings("deprecation")
 	private void showNotification(PushMessage message) {
 
-		Intent intent = new Intent(mContext, MainActivity.class);
-		intent.setAction(MqttIntent.MSGARRIVED);
-		intent.putExtra(MqttIntent.MSG, message);
+		Intent intent = new Intent(mContext, getStartActivity());
+		intent.setAction(PushIntent.MESSAGE_ARRIVED);
+		intent.putExtra(PushIntent.MESSAGE, message);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-		// Simply open the parent activity
-		PendingIntent pi = PendingIntent.getActivity(mContext, 0, intent, 0);
-		
-		
 		TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
 		// Adds the back stack
-		stackBuilder.addParentStack(MainActivity.class);
+		stackBuilder.addParentStack(getStartActivity());
 		// Adds the Intent to the top of the stack
 		stackBuilder.addNextIntent(intent);
 		// Gets a PendingIntent containing the entire back stack
-		PendingIntent resultPendingIntent =
-		        stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 		mNotifyBuilder.setContentIntent(resultPendingIntent);
 
 		// Start of a loop that processes data and then notifies the user
@@ -112,6 +121,9 @@ public class PushCallback implements MqttCallback {
 		mNotifyBuilder.setWhen(System.currentTimeMillis());
 		// Because the ID remains unchanged, the existing notification is
 		// updated.
-		mNotificationManager.notify(notifyID, mNotifyBuilder.build());
+		mNotificationManager.notify(notifyID, mNotifyBuilder.getNotification());
 	}
+
+	public abstract Class<?> getStartActivity();
+
 }
