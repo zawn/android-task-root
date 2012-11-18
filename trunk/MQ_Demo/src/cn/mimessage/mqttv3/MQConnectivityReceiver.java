@@ -45,7 +45,7 @@ public class MQConnectivityReceiver extends BroadcastReceiver {
 		if (BuildConfig.DEBUG)
 			Log.i(TAG, "notifyContextService");
 		final Intent service = new Intent(context, PushService.class);
-		service.setAction(MqttIntent.CONNECT_CHANGE);
+		service.setAction(PushIntent.CONNECT_CHANGE);
 		context.startService(service);
 	}
 }

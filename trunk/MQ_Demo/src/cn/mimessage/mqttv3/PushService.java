@@ -26,7 +26,7 @@ import android.util.Log;
  * 
  * @author ZhangZhenli
  */
-public class PushService extends LoopService {
+public abstract class PushService extends LoopService {
 
 	private static final String TAG = "PushService";
 	private PushClient mClient;
@@ -61,41 +61,41 @@ public class PushService extends LoopService {
 	}
 
 	@Override
-	protected void handleNewIntent(Intent intent) {
+	final protected void handleNewIntent(Intent intent) {
 		Log.i(TAG, "handleNewIntent Start------");
 		Log.i(TAG, "Thread Id:" + Thread.currentThread().getId() + "Thread Name:" + Thread.currentThread().getName());
 		String a = intent.getAction();
-		PushMessage message = (PushMessage) intent.getSerializableExtra(MqttIntent.MSG);
+		PushMessage message = (PushMessage) intent.getSerializableExtra(PushIntent.MESSAGE);
 		if (mClient == null) {
-			mClient = PushClient.getInstance(getApplicationContext());
+			mClient = PushClient.getInstance(getApplicationContext(), getPushCallback(), getPushConfig());
 		}
 		// Do an appropriate action based on the intent.
 		try {
-			if (MqttIntent.CONNECT.equals(a)) {
+			if (PushIntent.CONNECT.equals(a)) {
 				log("To establish a connection with the server");
 				mClient.connect();
-			} else if (MqttIntent.PUBLISH.equals(a)) {
+			} else if (PushIntent.PUBLISH.equals(a)) {
 				log("Publish message:" + message.toString());
 				mClient.publish(message);
-			} else if (MqttIntent.SUBSCRIBE.equals(a)) {
+			} else if (PushIntent.SUBSCRIBE.equals(a)) {
 				log("Subscribing to topic:" + message.toString());
 				mClient.subscribe(message.getTopicName(), message.getQos());
-			} else if (MqttIntent.UNSUBSCRIBE.equals(a)) {
+			} else if (PushIntent.UNSUBSCRIBE.equals(a)) {
 				log("Unsubscribe topic:" + message.toString());
 				mClient.unsubscribe(message.getTopicName());
-			} else if (MqttIntent.KEEPALIVE.equals(a)) {
+			} else if (PushIntent.KEEPALIVE.equals(a)) {
 				log("KeepAlive...");
 				mClient.keepAlive();
-			} else if (MqttIntent.RECONNECT.equals(a)) {
+			} else if (PushIntent.RECONNECT.equals(a)) {
 				log("Reconnect...");
 				mClient.reconnect();
-			} else if (MqttIntent.DISCONNECT.equals(a)) {
+			} else if (PushIntent.DISCONNECT.equals(a)) {
 				log("Terminate the connection");
 				stopSelf();
-			} else if (MqttIntent.CONNECT_CHANGE.equals(a)) {
+			} else if (PushIntent.CONNECT_CHANGE.equals(a)) {
 				log("connect_change");
 				handlerConnectChange();
-			} else if (MqttIntent.CONNECT_LOST.equals(a)) {
+			} else if (PushIntent.CONNECT_LOST.equals(a)) {
 				log("CONNECT_LOST");
 				handlerConnectChange();
 			} else {
@@ -125,7 +125,7 @@ public class PushService extends LoopService {
 		}
 	}
 
-	public class RealHandlerConnectChange extends TimerTask {
+	final public class RealHandlerConnectChange extends TimerTask {
 
 		@Override
 		public void run() {
@@ -162,5 +162,9 @@ public class PushService extends LoopService {
 			Log.i(TAG, message);
 		}
 	}
+
+	public abstract PushCallback getPushCallback();
+
+	public abstract PushConfig getPushConfig();
 
 }

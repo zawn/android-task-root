@@ -28,10 +28,10 @@ import org.eclipse.paho.client.mqttv3.MqttTopic;
 
 import android.content.Context;
 import android.util.Log;
-
 import cn.mimail.sdk.util.Utils;
 
 /**
+ * 继承自{@link MqttClient} 实现在Android平台上的连接的建立\重连\消息发送,初始化MQTT环境
  * 
  * @author ZhangZhenli
  */
@@ -43,7 +43,6 @@ public class PushClient extends MqttClient {
 	private static PushClient mPushClient;
 	private static MqttConnectOptions mConnectOptions;
 	private static PushCallback mCallback;
-	private Context mConext;
 
 	/**
 	 * @param serverURI
@@ -57,14 +56,14 @@ public class PushClient extends MqttClient {
 
 	private static final String TAG = "PushClient.java";
 
-	public static PushClient getInstance(Context context) {
+	public static PushClient getInstance(Context context, PushCallback callback, PushConfig config) {
 		if (mPushClient == null) {
-			initMqttClient(context);
+			initMqttClient(context, callback, config);
 		}
 		return mPushClient;
 	}
 
-	private static MqttClient initMqttClient(Context context) {
+	private static MqttClient initMqttClient(Context context, PushCallback callback, PushConfig config) {
 		File logFile = new File(Utils.getDiskFilesDir(context), "mqtt-trace.properties");
 		if (!logFile.exists()) {
 			Properties traceProperties = new Properties();
@@ -89,7 +88,7 @@ public class PushClient extends MqttClient {
 
 		System.setProperty("org.eclipse.paho.client.mqttv3.trace", logFile.getAbsolutePath());
 
-		mServerURI = Mqttv3Utils.getBrokerUrl();
+		mServerURI = config.getServerUrl();
 
 		// This stores files in a cache directory
 		String tmpDir = Utils.getDiskCacheDir(context, "13900000000").getPath();
@@ -104,8 +103,8 @@ public class PushClient extends MqttClient {
 		mConnectOptions = new MqttConnectOptions();
 		mConnectOptions.setCleanSession(false);
 		mConnectOptions.setKeepAliveInterval(60);
-		mCallback = new PushCallback(context);
-		mClientId = Mqttv3Utils.getClientId();
+		mCallback = callback;
+		mClientId = config.getClientId();
 
 		try {
 			// Construct the MqttClient instance
@@ -121,7 +120,7 @@ public class PushClient extends MqttClient {
 	}
 
 	/**
-	 * 连接服务器该方法使用
+	 * 连接服务器
 	 * 
 	 * @throws MqttSecurityException
 	 * @throws MqttException
@@ -142,11 +141,12 @@ public class PushClient extends MqttClient {
 	/**
 	 * 检查连接是否有效,无效则重新连接,否则维持现有连接
 	 * 
-	 * @param type
+	 * @param type 当前连接类型,{@link android.net.NetworkInfo}.getType()
 	 */
 	public void reconnectIfNecessary(int type) {
 		Log.i(TAG, "reConnectIfNecessary");
 		// TODO 优化重练逻辑
+		// keepAlive();
 		reconnect();
 	}
 
@@ -250,9 +250,10 @@ public class PushClient extends MqttClient {
 	}
 
 	/**
-	 * 
+	 * 主动向服务器发送Ping包,
 	 */
 	public void keepAlive() {
-		Log.i(TAG, "keepAlive");
+		Log.i(TAG, "PushClient.keepAlive()");
+		throw new UnsupportedOperationException("This method does not implemented");
 	}
 }
