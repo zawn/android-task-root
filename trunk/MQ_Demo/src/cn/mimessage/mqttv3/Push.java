@@ -8,11 +8,6 @@
  */
 package cn.mimessage.mqttv3;
 
-import org.eclipse.paho.client.mqttv3.MqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.MqttTopic;
-
-import android.util.Log;
 
 /**
  * 
@@ -24,11 +19,16 @@ public class Push extends PushService {
 
 	@Override
 	public PushCallback getPushCallback() {
-		return null;
+		return new CallBack(getApplicationContext(), this.getClass());
 	}
 
 	@Override
 	public PushConfig getPushConfig() {
 		return new MConfig();
+	}
+	
+	@Override
+	public boolean isEnableBackgroundService() {
+		return false;		
 	}
 }

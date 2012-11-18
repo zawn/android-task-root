@@ -13,6 +13,8 @@ import java.util.TimerTask;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 
+import cn.mimail.sdk.util.Utils;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -33,6 +35,7 @@ public abstract class PushService extends LoopService {
 	private final Timer timer = new Timer("Push Service Connect Change");
 	private RealHandlerConnectChange connectTimeTask;
 	private final Object timeTaskLock = new Object();
+	private PushCallback mCallback;
 
 	public PushService() {
 		super("PushService");
@@ -66,8 +69,23 @@ public abstract class PushService extends LoopService {
 		Log.i(TAG, "Thread Id:" + Thread.currentThread().getId() + "Thread Name:" + Thread.currentThread().getName());
 		String a = intent.getAction();
 		PushMessage message = (PushMessage) intent.getSerializableExtra(PushIntent.MESSAGE);
+		// 在收到断开连接的消息终止服务,在不需要启用后台服务的时候忽略网络变化以及连接丢失
+		if (PushIntent.DISCONNECT.equals(a)
+				|| (!isEnableBackgroundService() && !Utils.isApplicationForeground(getApplicationContext()) && (PushIntent.CONNECT_CHANGE
+						.equals(a) || PushIntent.CONNECT_LOST.equals(a)))) {
+			log("Terminate the connection");
+			Log.w(TAG, "Stop Service");
+			stopSelf();
+			return;
+		}
 		if (mClient == null) {
-			mClient = PushClient.getInstance(getApplicationContext(), getPushCallback(), getPushConfig());
+			 mCallback = getPushCallback();
+			final PushConfig config = getPushConfig();
+			if (mCallback == null || config == null) {
+				Log.e(TAG, "The PushCallback or PushConfig object is null");
+				throw new NullPointerException("The PushCallback or PushConfig object is null");
+			}
+			mClient = PushClient.getInstance(getApplicationContext(), mCallback, config);
 		}
 		// Do an appropriate action based on the intent.
 		try {
@@ -89,15 +107,15 @@ public abstract class PushService extends LoopService {
 			} else if (PushIntent.RECONNECT.equals(a)) {
 				log("Reconnect...");
 				mClient.reconnect();
-			} else if (PushIntent.DISCONNECT.equals(a)) {
-				log("Terminate the connection");
-				stopSelf();
 			} else if (PushIntent.CONNECT_CHANGE.equals(a)) {
 				log("connect_change");
 				handlerConnectChange();
 			} else if (PushIntent.CONNECT_LOST.equals(a)) {
 				log("CONNECT_LOST");
 				handlerConnectChange();
+			} else if (PushIntent.NOTIFICATION_READ.equals(a)) {
+				log("NOTIFICATION_READ");
+				mCallback.notificationRead();
 			} else {
 				if (BuildConfig.DEBUG) {
 					Log.w(TAG, "onHandleIntent intent action Undefined");
@@ -163,8 +181,26 @@ public abstract class PushService extends LoopService {
 		}
 	}
 
+	/**
+	 * 返回消息的回调函数
+	 * 
+	 * @return
+	 */
 	public abstract PushCallback getPushCallback();
 
+	/**
+	 * 返回连接的配置信息
+	 * 
+	 * @return
+	 */
 	public abstract PushConfig getPushConfig();
 
+	/**
+	 * 是否启用后台服务,默认启用后台服务.如果无需启用/或者需要灵活控制是否启用后台服务,子类需要覆盖此方法. 注意:在不启用后台服务的时候在软件关闭前程序需要主动关闭服务.
+	 * 
+	 * @return true 启用后台服务,false 不启用后台服务
+	 */
+	public boolean isEnableBackgroundService() {
+		return true;
+	}
 }

@@ -27,4 +27,5 @@ public class PushIntent {
 	public static final String MESSAGE 				= "cn.mimessage.mqttv3.MQTT_MESSAGE";
 	public static final String MESSAGE_ARRIVED 		= "cn.mimessage.mqttv3.MQTT_MESSAGE_ARRIVED";
 	public static final String MESSAGE_DELIVERED 	= "cn.mimessage.mqttv3.MQTT_MESSAGE_DELIVERED";
+	public static final String NOTIFICATION_READ 	= "cn.mimessage.mqttv3.NOTIFICATION_READ";
 }
