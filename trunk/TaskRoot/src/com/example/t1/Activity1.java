@@ -46,14 +46,6 @@ public class Activity1 extends Activity {
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		Log.d(TAG, "onKeyDown");
-//		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-//			Intent intent = new Intent(Activity1.this, MainActivity.class);
-//			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//			intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-//			intent.setAction("exit");
-//			startActivity(intent);
-//			return true;
-//		}
 		return super.onKeyDown(keyCode, event);
 	}
 

@@ -1,5 +1,6 @@
 package com.example.t1;
 
+import cn.mimail.sdk.app.MiTask;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,7 +32,7 @@ public class DialogActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(DialogActivity.this, TaskRoot.class);
+				Intent intent = new Intent(DialogActivity.this, MiTask.class);
 				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 				startActivity(intent);
@@ -51,7 +52,7 @@ public class DialogActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(DialogActivity.this, TaskRoot.class);
+				Intent intent = new Intent(DialogActivity.this, MiTask.class);
 				startActivity(intent);
 			}
 		});

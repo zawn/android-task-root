@@ -12,6 +12,7 @@ public class MyApp extends MiApp {
 	public void onCreate() {
 		Log.i(TAG, "MyApp.onCreate()-------------------------------------------------------------");
 		super.onCreate();
+		setDefaultActivityClass(Activity1.class);
 	}
 
 	/*
