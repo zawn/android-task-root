@@ -240,7 +240,7 @@ public class Utils {
 		final StatFs stats = new StatFs(path.getPath());
 		return (long) stats.getBlockSize() * (long) stats.getAvailableBlocks();
 	}
-	
+
 	/**
 	 * 判断content给定的程序是否处于前台<br />
 	 * 注意:运行此方法需要<br />
@@ -260,7 +260,7 @@ public class Utils {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * 判断cls给定Activity的是否处于前台<br />
 	 * 注意:运行此方法需要<br />
@@ -269,7 +269,7 @@ public class Utils {
 	 * @param context
 	 * @return true:Activity处于前台运行,false:Activity未处于前台状态
 	 */
-	public static boolean isActivityForeground(final Context context,Class<?> cls) {
+	public static boolean isActivityForeground(final Context context, Class<?> cls) {
 		ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 		List<RunningTaskInfo> tasks = am.getRunningTasks(1);
 		if (!tasks.isEmpty()) {
@@ -279,5 +279,25 @@ public class Utils {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Workaround for bug pre-Froyo, see here for more info: http://android-developers.blogspot.com/2011/09/androids-http-clients.html
+	 */
+	public static void disableConnectionReuseIfNecessary() {
+		// HTTP connection reuse which was buggy pre-froyo
+		if (hasHttpConnectionBug()) {
+			System.setProperty("http.keepAlive", "false");
+		}
+	}
+
+	/**
+	 * Check if OS version has a http URLConnection bug. See here for more information:
+	 * http://android-developers.blogspot.com/2011/09/androids-http-clients.html
+	 * 
+	 * @return
+	 */
+	public static boolean hasHttpConnectionBug() {
+		return Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO;
 	}
 }
