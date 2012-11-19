@@ -12,7 +12,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
         <activity
-            android:name=".TaskRoot"
+            android:name="cn.mimail.sdk.app.MiTask"
             android:theme="@android:style/Theme.NoDisplay" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,9 +25,6 @@
         <activity android:name=".Activity3" />
         <activity android:name=".Activity4" />
         <activity android:name=".Activity5" />
-        <activity
-            android:name=".ExitActivity"
-            android:launchMode="singleTask" />
         <activity
             android:name=".DialogActivity"
             android:theme="@android:style/Theme.Dialog" />

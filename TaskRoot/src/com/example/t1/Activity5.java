@@ -1,5 +1,6 @@
 package com.example.t1;
 
+import cn.mimail.sdk.app.MiTask;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,7 +32,7 @@ public class Activity5 extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(Activity5.this, TaskRoot.class);
+				Intent intent = new Intent(Activity5.this, MiTask.class);
 				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 				startActivity(intent);
@@ -85,7 +86,7 @@ public class Activity5 extends Activity {
 					e.printStackTrace();
 				}
 				try {
-					Log.i(TAG, "MyApp.getInstance()5" + ((MyApp)MyApp.getInstance()).profiles);
+					Log.i(TAG, "MyApp.getInstance()5" + ((MyApp) MyApp.getInstance()).profiles);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -124,7 +125,7 @@ public class Activity5 extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				TaskRoot.switchActivity(Activity5.this, TaskRoot.class);
+				MiTask.exitTask(Activity5.this);
 			}
 		});
 	}
