@@ -19,6 +19,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <meta-data
+                android:name="cn.mimail.DEFAULT_LAUNCH_ACTIVITY"
+                android:value="com.example.t1.Activity1" />
         </activity>
         <activity android:name=".Activity1" />
         <activity android:name=".Activity2" />
