@@ -50,7 +50,7 @@ public final class MiTask extends Activity {
 	 */
 	private static Class<?> clazz = MiApp.getDefaultActivityClass();
 
-	private void intentHandler(final Intent intent) {
+	private void onHandleIntent(final Intent intent) {
 		final Class<?> cls = (Class<?>) intent.getSerializableExtra(TARGET_CLASS);
 		final Bundle bundle = (Bundle) intent.getBundleExtra(BUNDLE_DATA);
 		Log.i(TAG, "Target class is:" + ((cls == null) ? "null" : cls.getName()));
@@ -101,7 +101,7 @@ public final class MiTask extends Activity {
 			mIsNewIntent = true;
 			// 这是一个新的TaskRoot实例,执行默认的操作
 			final Intent intent = getIntent();
-			intentHandler(intent);
+			onHandleIntent(intent);
 		}
 	}
 
@@ -125,7 +125,7 @@ public final class MiTask extends Activity {
 			Log.i(TAG, "onNewIntent");
 		mIsNewIntent = true;
 		setIntent(intent);
-		intentHandler(intent);
+		onHandleIntent(intent);
 	}
 
 	@Override
@@ -139,7 +139,7 @@ public final class MiTask extends Activity {
 				Log.i(TAG, "mIsNewIntent = true");
 			mIsNewIntent = false;
 		} else {
-			// 说明该Intent不是新传入的,既是通过返回键返回到该实例的,这是Task中只有该实例了,应终止程序.
+			// 说明该Intent不是新传入的,即是通过返回键返回到该实例的,这时候Task中只有该实例了,应终止程序.
 			if (BuildConfig.DEBUG)
 				Log.i(TAG, "mIsNewIntent = false");
 			initiativeDestroy();
@@ -197,11 +197,9 @@ public final class MiTask extends Activity {
 	}
 
 	/**
-	 * 用于退出任务便捷方法,该方法将销毁任务栈中的所有Activity并退出程序<br>
+	 * 用于退出程序的便捷方法,该方法将销毁任务栈中的所有Activity并退出程序<br>
 	 * 
 	 * @param packageContext A Context of the application package implementing this class.
-	 * @param cls The component class that is to be used for the intent.
-	 * @param bundle To attach to the intent of the parameters
 	 */
 	public static void exitTask(Context packageContext) {
 		switchActivity(packageContext, MiTask.class);
