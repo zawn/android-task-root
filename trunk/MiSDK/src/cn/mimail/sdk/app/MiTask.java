@@ -11,24 +11,32 @@ package cn.mimail.sdk.app;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageItemInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.util.Log;
 
 /**
- * MiTask的子类(YOUR_SUBCLASS)应是其所在的Task的根Activity,即在程序的<code>AndroidManifest.xml</code><br>
- * 中声明为如下形式: <br>
+ * MiTask应是其所在的Task的根Activity,即在程序的<code>AndroidManifest.xml</code><br>
+ * 中应声明为如下形式: <br>
  * <p>
- * &nbsp; &nbsp; &nbsp; &nbsp; &lt;activity<br />
- * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:name="<i>YOUR_PACKAGE_NAME</i>.YOUR_SUBCLASS"<br />
- * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:theme="@android:style/Theme.NoDisplay" &gt;<br />
- * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;intent-filter&gt;<br />
- * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;action android:name="android.intent.action.MAIN" /&gt;<br />
- * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;category android:name="android.intent.category.LAUNCHER" /&gt;<br />
- * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/intent-filter&gt;<br />
- * &nbsp; &nbsp; &nbsp; &nbsp; &lt;/activity&gt;
+ * <p>
+ * &lt;activity<br />
+ * &nbsp; &nbsp; android:name="cn.mimail.sdk.app.MiTask"<br />
+ * &nbsp; &nbsp; android:theme="@android:style/Theme.NoDisplay" &gt;<br />
+ * &nbsp; &nbsp; &lt;intent-filter&gt;<br />
+ * &nbsp; &nbsp; &nbsp; &nbsp; &lt;action android:name="android.intent.action.MAIN" /&gt;<br />
+ * &nbsp; &nbsp; &nbsp; &nbsp; &lt;category android:name="android.intent.category.LAUNCHER" /&gt;<br />
+ * &nbsp; &nbsp; &lt;/intent-filter&gt;<br />
+ * &nbsp; &nbsp; &lt;meta-data<br />
+ * &nbsp; &nbsp; &nbsp; &nbsp; android:name="cn.mimail.DEFAULT_LAUNCH_ACTIVITY"<br />
+ * &nbsp; &nbsp; &nbsp; &nbsp; android:value="com.example.Activity" /&gt;<br />
+ * &lt;/activity&gt;<br />
  * </p>
  * <p>
- * <br />
+ * 其中字符串com.example.Activity应替换为程序需要启动的第一个Activity的完整路径
  * </p>
  * 该Activity没有视图界面,只用于接收Intent并启动相应的Activity,并作为程序的Task<br>
  * 的Root Activity存在,用于程序退出.同时,给类可以去除部分机型的启动白屏/黑屏,优化<br>
@@ -36,27 +44,29 @@ import android.util.Log;
  * 
  * @author Zawn
  */
-public abstract class MiTask extends Activity {
+final public class MiTask extends Activity {
 
 	private static final String TAG = "MiTask.java";
-	private static final boolean DEBUG = false;
-	private static final String ORIGINAL_INTENT = "cn.mimail.ORIGINAL_INTENT";	// intent 数据名, 该实例接收到的前一个Intent对象
-	private static final String DEFAULT_CLASS 	= "cn.mimail.DEFAULT_CLASS";	// intent 数据名, 默认的需要启动的Activity	
-	private static final String TARGET_CLASS 	= "cn.mimail.TARGET_CLASS";		// intent 数据名, 需要启动的目标Activity
-	private static final String BUNDLE_DATA 	= "cn.mimail.BUNDLE_DATA";		// intent 数据名, 启动Activity是需附带的参数
+	private static final boolean DEBUG = true;
+	private static final String DEFAULT_LAUNCH_ACTIVITY	= "cn.mimail.DEFAULT_LAUNCH_ACTIVITY";	// intent 数据名, 默认的需要启动的Activity	
+	private static final String CURRENT_LAUNCH_ACTIVITY	= "cn.mimail.CURRENT_LAUNCH_ACTIVITY";	// intent 数据名, 需要启动的目标Activity
+	private static final String ORIGINAL_INTENT 		= "cn.mimail.ORIGINAL_INTENT";			// intent 数据名, 该实例接收到的前一个Intent对象
+	private static final String BUNDLE_DATA 			= "cn.mimail.BUNDLE_DATA";				// intent 数据名, 启动Activity是需附带的参数
 	private static boolean mIsNewIntent;	// 标识该intent是否是新的Intent
 	private boolean mInitiativeDestroy;		// 标识是否需要主动销毁自己
 	private static Class<?> clazz;			// 需要启动的默认的Activity
 
 	private void onHandleIntent(final Intent intent) {
-		final Class<?> cls = (Class<?>) intent.getSerializableExtra(TARGET_CLASS);
+		if (DEBUG)
+			Log.i(TAG, "MiTask.onHandleIntent()");
+		final Class<?> cls = (Class<?>) intent.getSerializableExtra(CURRENT_LAUNCH_ACTIVITY);
 		final Bundle bundle = (Bundle) intent.getBundleExtra(BUNDLE_DATA);
 		if (DEBUG)
 			Log.i(TAG, "Target class is:" + ((cls == null) ? "null" : cls.getName()));
 		final Intent i;
 		if (cls == null) {
 			if (DEBUG)
-				Log.i(TAG, "Start the default activity");
+				Log.i(TAG, "Start the default activity :" + clazz.getName());
 			i = new Intent(this, clazz);
 			if (bundle != null) {
 				i.putExtras(bundle);
@@ -80,9 +90,9 @@ public abstract class MiTask extends Activity {
 	}
 
 	@Override
-	final protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		if (DEBUG)
-			Log.i(TAG, "onCreate");
+			Log.i(TAG, "MiTask.onCreate()");
 		super.onCreate(savedInstanceState);
 		if (!isTaskRoot()) {
 			throw new RuntimeException(
@@ -95,9 +105,9 @@ public abstract class MiTask extends Activity {
 			// 2,程序通过Intent启动该Activity.
 			mIsNewIntent = false;
 			setIntent((Intent) savedInstanceState.getParcelable(ORIGINAL_INTENT));
-			clazz = (Class<?>) savedInstanceState.getSerializable(DEFAULT_CLASS);
+			clazz = (Class<?>) savedInstanceState.getSerializable(DEFAULT_LAUNCH_ACTIVITY);
 		} else {
-			clazz = this.getDefaultActivityClass();
+			clazz = this.getDefaultLaunchActivity();
 			// 新的TaskRoot实例,是第一次接收到该Intent,所以置位为true
 			mIsNewIntent = true;
 			// 这是一个新的TaskRoot实例,执行默认的操作
@@ -110,7 +120,7 @@ public abstract class MiTask extends Activity {
 	final protected void onDestroy() {
 		super.onDestroy();
 		if (DEBUG)
-			Log.i(TAG, "onDestroy");
+			Log.i(TAG, "MiTask.onDestroy()");
 		if (mInitiativeDestroy) {
 			mInitiativeDestroy = false;
 			if (DEBUG)
@@ -123,7 +133,7 @@ public abstract class MiTask extends Activity {
 	@Override
 	final protected void onNewIntent(final Intent intent) {
 		if (DEBUG)
-			Log.i(TAG, "onNewIntent");
+			Log.i(TAG, "MiTask.onNewIntent()");
 		mIsNewIntent = true;
 		setIntent(intent);
 		onHandleIntent(intent);
@@ -133,7 +143,7 @@ public abstract class MiTask extends Activity {
 	final protected void onResume() {
 		super.onResume();
 		if (DEBUG)
-			Log.i(TAG, "onResume");
+			Log.i(TAG, "MiTask.onResume()");
 		if (mIsNewIntent) {
 			// 置位,等待下一次NewIntent的到来.
 			if (DEBUG)
@@ -142,7 +152,7 @@ public abstract class MiTask extends Activity {
 		} else {
 			// 说明该Intent不是新传入的,即是通过返回键返回到该实例的,这时候Task中只有该实例了,应终止程序.
 			if (DEBUG)
-				Log.i(TAG, "mIsNewIntent = false");
+				Log.i(TAG, "mIsNewIntent = false,Intent is not a new incoming, namely user presses the Back key to return to this instance, should terminate the program at this time.");
 			initiativeDestroy();
 		}
 	}
@@ -150,9 +160,9 @@ public abstract class MiTask extends Activity {
 	@Override
 	final protected void onSaveInstanceState(Bundle outState) {
 		if (DEBUG)
-			Log.i(TAG, "onSaveInstanceState");
+			Log.i(TAG, "MiTask.onSaveInstanceState()");
 		outState.putParcelable(ORIGINAL_INTENT, getIntent());
-		outState.putSerializable(DEFAULT_CLASS, clazz);
+		outState.putSerializable(DEFAULT_LAUNCH_ACTIVITY, clazz);
 		super.onSaveInstanceState(outState);
 	}
 
@@ -160,6 +170,8 @@ public abstract class MiTask extends Activity {
 	 * 主动销毁
 	 */
 	private void initiativeDestroy() {
+		if (DEBUG)
+			Log.i(TAG, "MiTask.initiativeDestroy()");
 		mInitiativeDestroy = true;
 		finish();
 	}
@@ -192,7 +204,7 @@ public abstract class MiTask extends Activity {
 	public static void switchActivity(Context packageContext, Class<?> cls, Bundle bundle) {
 		Intent intent = new Intent(packageContext, MiTask.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		intent.putExtra(TARGET_CLASS, cls);
+		intent.putExtra(CURRENT_LAUNCH_ACTIVITY, cls);
 		intent.putExtra(BUNDLE_DATA, bundle);
 		packageContext.startActivity(intent);
 	}
@@ -218,5 +230,23 @@ public abstract class MiTask extends Activity {
 	/**
 	 * 返回默认的需要启动的Activity
 	 */
-	protected abstract Class<?> getDefaultActivityClass();
+	private Class<?> getDefaultLaunchActivity(){
+		if (DEBUG)
+			Log.i(TAG, "MiTask.getDefaultLaunchActivity()");
+			PackageItemInfo activityInfo;
+			try {
+				activityInfo = getPackageManager().getActivityInfo(getComponentName(), PackageManager.GET_META_DATA);
+				String activityName = activityInfo.metaData.getString(DEFAULT_LAUNCH_ACTIVITY);
+				if (activityName != null) {
+					return Class.forName(activityName);
+				}			
+			} catch (NameNotFoundException e) {
+				throw new RuntimeException(
+						"MiTask did not find the default to launch Activity, make sure you have configured <meta-data> correctly in the AndroidManifest.xml");
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException(
+						"MiTask did not find the default to launch Activity, make sure you provide the name of the class is correct and complete");
+			}
+		return null;
+	}
 }
