@@ -40,9 +40,10 @@ public final class MiTask extends Activity {
 
 	private static final String TAG = "MiTask.java";
 	private static boolean mIsNewIntent;
-	private static final String ORIGINAL_INTENT = "original_intent";
-	private static final String TARGET_CLASS = "cn.mimail.TARGET_CLASS";
-	private static final String BUNDLE_DATA = "cn.mimail.BUNDLE_DATA";
+	private static final String ORIGINAL_INTENT = "cn.mimail.ORIGINAL_INTENT";
+	private static final String DEFAULT_CLASS 	= "cn.mimail.DEFAULT_CLASS";
+	private static final String TARGET_CLASS 	= "cn.mimail.TARGET_CLASS";
+	private static final String BUNDLE_DATA 	= "cn.mimail.BUNDLE_DATA";
 	private boolean mInitiativeDestroy;
 
 	/*
@@ -86,7 +87,8 @@ public final class MiTask extends Activity {
 			Log.i(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
 		if (!isTaskRoot()) {
-			throw new RuntimeException("MiTask is not the root of this task.  The root is the first activity in a task.");
+			throw new RuntimeException(
+					"MiTask is not the root of this task.  The root is the first activity in a task.");
 		}
 
 		if (savedInstanceState != null) {
@@ -95,7 +97,7 @@ public final class MiTask extends Activity {
 			// 2,程序通过Intent启动该Activity.
 			mIsNewIntent = false;
 			setIntent((Intent) savedInstanceState.getParcelable(ORIGINAL_INTENT));
-			clazz = (Class<?>) savedInstanceState.getSerializable("DefaultActivityClass");
+			clazz = (Class<?>) savedInstanceState.getSerializable(DEFAULT_CLASS);
 		} else {
 			// 新的TaskRoot实例,是第一次接收到该Intent,所以置位为true
 			mIsNewIntent = true;
@@ -151,7 +153,7 @@ public final class MiTask extends Activity {
 		if (BuildConfig.DEBUG)
 			Log.i(TAG, "onSaveInstanceState");
 		outState.putParcelable(ORIGINAL_INTENT, getIntent());
-		outState.putSerializable("DefaultActivityClass", clazz);
+		outState.putSerializable(DEFAULT_CLASS, clazz);
 		super.onSaveInstanceState(outState);
 	}
 
