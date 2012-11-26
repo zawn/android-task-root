@@ -51,7 +51,8 @@ public abstract class MiTask extends Activity {
 	private void onHandleIntent(final Intent intent) {
 		final Class<?> cls = (Class<?>) intent.getSerializableExtra(TARGET_CLASS);
 		final Bundle bundle = (Bundle) intent.getBundleExtra(BUNDLE_DATA);
-		Log.i(TAG, "Target class is:" + ((cls == null) ? "null" : cls.getName()));
+		if (DEBUG)
+			Log.i(TAG, "Target class is:" + ((cls == null) ? "null" : cls.getName()));
 		final Intent i;
 		if (cls == null) {
 			if (DEBUG)
