@@ -36,7 +36,7 @@ import cn.mimail.misdk.BuildConfig;
  * 
  * @author Zawn
  */
-public final class MiTask extends Activity {
+public abstract class MiTask extends Activity {
 
 	private static final String TAG = "MiTask.java";
 	private static boolean mIsNewIntent;
@@ -82,7 +82,7 @@ public final class MiTask extends Activity {
 	}
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	final protected void onCreate(Bundle savedInstanceState) {
 		if (BuildConfig.DEBUG)
 			Log.i(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
@@ -108,21 +108,21 @@ public final class MiTask extends Activity {
 	}
 
 	@Override
-	protected void onDestroy() {
+	final protected void onDestroy() {
 		super.onDestroy();
 		if (BuildConfig.DEBUG)
 			Log.i(TAG, "onDestroy");
 		if (mInitiativeDestroy) {
 			mInitiativeDestroy = false;
 			if (BuildConfig.DEBUG)
-				Log.i(TAG, "Start terminate instances");
+				Log.i(TAG, "MiTask.java Terminate this instance");
 			android.os.Process.killProcess(android.os.Process.myPid());
 			// 接下来的所有逻辑将不会被执行,包括上一个Activity的onStop和onDestroy方法
 		}
 	}
 
 	@Override
-	protected void onNewIntent(final Intent intent) {
+	final protected void onNewIntent(final Intent intent) {
 		if (BuildConfig.DEBUG)
 			Log.i(TAG, "onNewIntent");
 		mIsNewIntent = true;
@@ -131,7 +131,7 @@ public final class MiTask extends Activity {
 	}
 
 	@Override
-	protected void onResume() {
+	final protected void onResume() {
 		super.onResume();
 		if (BuildConfig.DEBUG)
 			Log.i(TAG, "onResume");
@@ -149,7 +149,7 @@ public final class MiTask extends Activity {
 	}
 
 	@Override
-	protected void onSaveInstanceState(Bundle outState) {
+	final protected void onSaveInstanceState(Bundle outState) {
 		if (BuildConfig.DEBUG)
 			Log.i(TAG, "onSaveInstanceState");
 		outState.putParcelable(ORIGINAL_INTENT, getIntent());
@@ -187,7 +187,7 @@ public final class MiTask extends Activity {
 	 * 时{@link MiTask}将自我销毁,程序退出.
 	 * 
 	 * @param packageContext A Context of the application package implementing this class.
-	 * @param cls The component class that is to be used for the intent.
+	 * @param cls The component class that is to be used for the intent,If NUll default components will be started
 	 * @param bundle To attach to the intent of the parameters
 	 */
 	public static void switchActivity(Context packageContext, Class<?> cls, Bundle bundle) {
@@ -206,5 +206,16 @@ public final class MiTask extends Activity {
 	public static void exitTask(Context packageContext) {
 		switchActivity(packageContext, MiTask.class);
 	}
+
+	/**
+	 * 重新启动软件,注意,该重启方法并不能销毁Application对象,
+	 * 
+	 * @param packageContext A Context of the application package implementing this class.
+	 */
+	public static void reStart(Context packageContext) {
+		switchActivity(packageContext, null);
+	}
+	
+	
 
 }
