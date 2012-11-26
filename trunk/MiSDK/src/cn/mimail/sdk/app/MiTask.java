@@ -16,11 +16,11 @@ import android.util.Log;
 import cn.mimail.misdk.BuildConfig;
 
 /**
- * TaskRoot应是其所在的Task的根Activity,即在程序的<code>AndroidManifest.xml</code><br>
+ * MiTask的子类(YOUR_SUBCLASS)应是其所在的Task的根Activity,即在程序的<code>AndroidManifest.xml</code><br>
  * 中声明为如下形式: <br>
  * <p>
  * &nbsp; &nbsp; &nbsp; &nbsp; &lt;activity<br />
- * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:name="<i>YOUR_PACKAGE_NAME</i>.TaskRoot"<br />
+ * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:name="<i>YOUR_PACKAGE_NAME</i>.YOUR_SUBCLASS"<br />
  * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:theme="@android:style/Theme.NoDisplay" &gt;<br />
  * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;intent-filter&gt;<br />
  * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;action android:name="android.intent.action.MAIN" /&gt;<br />
@@ -32,24 +32,22 @@ import cn.mimail.misdk.BuildConfig;
  * <br />
  * </p>
  * 该Activity没有视图界面,只用于接收Intent并启动相应的Activity,并作为程序的Task<br>
- * 的Root存在,用于程序退出.
+ * 的Root Activity存在,用于程序退出.同时,给类可以去除部分机型的启动白屏/黑屏,优化<br>
+ * 启动效果.
  * 
  * @author Zawn
  */
 public abstract class MiTask extends Activity {
 
 	private static final String TAG = "MiTask.java";
-	private static boolean mIsNewIntent;
-	private static final String ORIGINAL_INTENT = "cn.mimail.ORIGINAL_INTENT";
-	private static final String DEFAULT_CLASS 	= "cn.mimail.DEFAULT_CLASS";
-	private static final String TARGET_CLASS 	= "cn.mimail.TARGET_CLASS";
-	private static final String BUNDLE_DATA 	= "cn.mimail.BUNDLE_DATA";
-	private boolean mInitiativeDestroy;
-
-	/*
-	 * 默认启动的Activity
-	 */
-	private static Class<?> clazz = MiApp.getDefaultActivityClass();
+	private static final boolean DEBUG = false;
+	private static final String ORIGINAL_INTENT = "cn.mimail.ORIGINAL_INTENT";	// intent 数据名, 该实例接收到的前一个Intent对象
+	private static final String DEFAULT_CLASS 	= "cn.mimail.DEFAULT_CLASS";	// intent 数据名, 默认的需要启动的Activity	
+	private static final String TARGET_CLASS 	= "cn.mimail.TARGET_CLASS";		// intent 数据名, 需要启动的目标Activity
+	private static final String BUNDLE_DATA 	= "cn.mimail.BUNDLE_DATA";		// intent 数据名, 启动Activity是需附带的参数
+	private static boolean mIsNewIntent;	// 标识该intent是否是新的Intent
+	private boolean mInitiativeDestroy;		// 标识是否需要主动销毁自己
+	private static Class<?> clazz;			// 需要启动的默认的Activity
 
 	private void onHandleIntent(final Intent intent) {
 		final Class<?> cls = (Class<?>) intent.getSerializableExtra(TARGET_CLASS);
@@ -57,7 +55,7 @@ public abstract class MiTask extends Activity {
 		Log.i(TAG, "Target class is:" + ((cls == null) ? "null" : cls.getName()));
 		final Intent i;
 		if (cls == null) {
-			if (BuildConfig.DEBUG)
+			if (DEBUG)
 				Log.i(TAG, "Start the default activity");
 			i = new Intent(this, clazz);
 			if (bundle != null) {
@@ -83,7 +81,7 @@ public abstract class MiTask extends Activity {
 
 	@Override
 	final protected void onCreate(Bundle savedInstanceState) {
-		if (BuildConfig.DEBUG)
+		if (DEBUG)
 			Log.i(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
 		if (!isTaskRoot()) {
@@ -99,6 +97,7 @@ public abstract class MiTask extends Activity {
 			setIntent((Intent) savedInstanceState.getParcelable(ORIGINAL_INTENT));
 			clazz = (Class<?>) savedInstanceState.getSerializable(DEFAULT_CLASS);
 		} else {
+			clazz = this.getDefaultActivityClass();
 			// 新的TaskRoot实例,是第一次接收到该Intent,所以置位为true
 			mIsNewIntent = true;
 			// 这是一个新的TaskRoot实例,执行默认的操作
@@ -110,11 +109,11 @@ public abstract class MiTask extends Activity {
 	@Override
 	final protected void onDestroy() {
 		super.onDestroy();
-		if (BuildConfig.DEBUG)
+		if (DEBUG)
 			Log.i(TAG, "onDestroy");
 		if (mInitiativeDestroy) {
 			mInitiativeDestroy = false;
-			if (BuildConfig.DEBUG)
+			if (DEBUG)
 				Log.i(TAG, "MiTask.java Terminate this instance");
 			android.os.Process.killProcess(android.os.Process.myPid());
 			// 接下来的所有逻辑将不会被执行,包括上一个Activity的onStop和onDestroy方法
@@ -123,7 +122,7 @@ public abstract class MiTask extends Activity {
 
 	@Override
 	final protected void onNewIntent(final Intent intent) {
-		if (BuildConfig.DEBUG)
+		if (DEBUG)
 			Log.i(TAG, "onNewIntent");
 		mIsNewIntent = true;
 		setIntent(intent);
@@ -133,16 +132,16 @@ public abstract class MiTask extends Activity {
 	@Override
 	final protected void onResume() {
 		super.onResume();
-		if (BuildConfig.DEBUG)
+		if (DEBUG)
 			Log.i(TAG, "onResume");
 		if (mIsNewIntent) {
 			// 置位,等待下一次NewIntent的到来.
-			if (BuildConfig.DEBUG)
+			if (DEBUG)
 				Log.i(TAG, "mIsNewIntent = true");
 			mIsNewIntent = false;
 		} else {
 			// 说明该Intent不是新传入的,即是通过返回键返回到该实例的,这时候Task中只有该实例了,应终止程序.
-			if (BuildConfig.DEBUG)
+			if (DEBUG)
 				Log.i(TAG, "mIsNewIntent = false");
 			initiativeDestroy();
 		}
@@ -150,7 +149,7 @@ public abstract class MiTask extends Activity {
 
 	@Override
 	final protected void onSaveInstanceState(Bundle outState) {
-		if (BuildConfig.DEBUG)
+		if (DEBUG)
 			Log.i(TAG, "onSaveInstanceState");
 		outState.putParcelable(ORIGINAL_INTENT, getIntent());
 		outState.putSerializable(DEFAULT_CLASS, clazz);
@@ -215,7 +214,9 @@ public abstract class MiTask extends Activity {
 	public static void reStart(Context packageContext) {
 		switchActivity(packageContext, null);
 	}
-	
-	
 
+	/**
+	 * 返回默认的需要启动的Activity
+	 */
+	protected abstract Class<?> getDefaultActivityClass();
 }
