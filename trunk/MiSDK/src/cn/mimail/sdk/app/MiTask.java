@@ -24,28 +24,58 @@ import android.os.Bundle;
 import android.util.Log;
 
 /**
- * MiTask应是其所在的Task的根Activity,即在程序的<code>AndroidManifest.xml</code><br>
- * 中应声明为如下形式: <br>
- * <p>
- * <p>
- * &lt;activity<br />
- * &nbsp; &nbsp; android:name="cn.mimail.sdk.app.MiTask"<br />
- * &nbsp; &nbsp; android:theme="@android:style/Theme.NoDisplay" &gt;<br />
- * &nbsp; &nbsp; &lt;intent-filter&gt;<br />
- * &nbsp; &nbsp; &nbsp; &nbsp; &lt;action android:name="android.intent.action.MAIN" /&gt;<br />
- * &nbsp; &nbsp; &nbsp; &nbsp; &lt;category android:name="android.intent.category.LAUNCHER" /&gt;<br />
- * &nbsp; &nbsp; &lt;/intent-filter&gt;<br />
- * &nbsp; &nbsp; &lt;meta-data<br />
- * &nbsp; &nbsp; &nbsp; &nbsp; android:name="cn.mimail.DEFAULT_LAUNCH_ACTIVITY"<br />
- * &nbsp; &nbsp; &nbsp; &nbsp; android:value="com.example.Activity" /&gt;<br />
- * &lt;/activity&gt;<br />
- * </p>
- * <p>
- * 其中字符串com.example.Activity应替换为程序需要启动的第一个Activity的完整路径
- * </p>
  * 该Activity没有视图界面,只用于接收Intent并启动相应的Activity,并作为程序的Task<br>
- * 的Root Activity存在,用于程序退出.同时,给类可以去除部分机型的启动白屏/黑屏,优化<br>
- * 启动效果.
+ * 的Root Activity存在,用于程序退出.同时,该类可以去除部分机型的启动白屏/黑屏,优化<br>
+ * 启动效果. MiTask应是其所在的Task的根Activity,即在程序的<code>AndroidManifest.xml</code><br>
+ * 中应声明为如下形式:
+ * 
+ * <pre>
+ * {@code
+ *  <activity
+ * 	 android:name="cn.mimail.sdk.app.MiTask"
+ * 	 android:theme="@android:style/Theme.NoDisplay" >
+ * 	 <intent-filter>
+ * 		 <action android:name="android.intent.action.MAIN" />
+ * 
+ * 		 <category android:name="android.intent.category.LAUNCHER" />
+ * 	 </intent-filter>
+ *  </activity>
+ *  <activity
+ * 	 android:name=".MainActivity"
+ * 	 android:permission="YOUR_PERMISSION" >
+ * 	 <intent-filter>
+ * 		 <action android:name="cn.mimail.intent.action.MAIN" />
+ * 
+ * 		 <category android:name="android.intent.category.DEFAULT" />
+ * 	 </intent-filter>
+ *  </activity>
+ * }
+ * </pre>
+ * <p>
+ * 其中.MainActivity为程序需要启动的第一个Activity. 而YOUR_PERMISSION是为该Activity定义的权限,如果你不需要为该<br>
+ * Activity定义权限则可省略.<br>
+ * 或者,你也可以在AndroidManifest.xml中使用如下方式进行声明:
+ * 
+ * <pre>
+ * {@code
+ *  <activity
+ * 	 android:name="cn.mimail.sdk.app.MiTask"
+ * 	 android:theme="@android:style/Theme.NoDisplay" >
+ * 	 <intent-filter>
+ * 		 <action android:name="android.intent.action.MAIN" />
+ * 
+ * 		 <category android:name="android.intent.category.LAUNCHER" />
+ * 	 </intent-filter>
+ * 
+ * 	 <meta-data
+ * 		 android:name="cn.mimail.intent.action.MAIN"
+ * 		 android:value=".MainActivity" />
+ *  </activity>
+ * }
+ * </pre>
+ * <p>
+ * 其中.MainActivity为程序需要启动的第一个Activity.<br>
+ * 如果在AndroidManifest.xml中同时存在上述两种声明方式,则会忽略第二种声明.
  * 
  * @author Zawn
  */
@@ -53,13 +83,13 @@ final public class MiTask extends Activity {
 
 	private static final String TAG = "MiTask.java";
 	private static final boolean DEBUG = true;
-	
-	public static final String DEFAULT_LAUNCH_ACTIVITY 	= "cn.mimail.DEFAULT_LAUNCH_ACTIVITY";	// intent 数据名, 默认的需要启动的Activity
-	public static final String CURRENT_LAUNCH_ACTIVITY 	= "cn.mimail.CURRENT_LAUNCH_ACTIVITY";	// intent 数据名, 需要启动的目标Activity
-	public static final String BUNDLE_DATA				= "cn.mimail.BUNDLE_DATA";				// intent 数据名, 启动Activity是需附带的参数
-	
-	private static final String DEFAULT_LAUNCH_INTENT 	= "cn.mimail.DEFAULT_LAUNCH_INTENT";	// intent 数据名, 默认的需要启动的Activity
-	private static final String ORIGINAL_INTENT 		= "cn.mimail.ORIGINAL_INTENT";			// intent 数据名, 该实例接收到的前一个Intent对象
+
+	public static final String DEFAULT_LAUNCH_ACTIVITY 	= "cn.mimail.intent.action.MAIN";			// intent 数据名, 默认的需要启动的Activity
+	public static final String CURRENT_LAUNCH_ACTIVITY 	= "cn.mimail.intent.action.CURRENT_LAUNCH";	// intent 数据名, 需要启动的目标Activity
+	public static final String BUNDLE_DATA 				= "cn.mimail.intent.data.BUNDLE_DATA";		// intent 数据名, 启动Activity是需附带的参数
+
+	private static final String DEFAULT_LAUNCH_INTENT 	= "cn.mimail.DEFAULT_LAUNCH_INTENT";		// intent 数据名, 默认的需要启动的Activity
+	private static final String ORIGINAL_INTENT 		= "cn.mimail.ORIGINAL_INTENT";				// intent 数据名, 该实例接收到的前一个Intent对象
 	private static boolean mIsNewIntent;	// 标识该intent是否是新的Intent
 	private boolean mInitiativeDestroy;		// 标识是否需要主动销毁自己
 	private static Intent mDefaultLaunchInent;			// 需要启动的默认的Activity
@@ -196,8 +226,8 @@ final public class MiTask extends Activity {
 	 * @param cls The component class that is to be used for the intent.
 	 */
 	public static void switchActivity(Context packageContext, Class<?> cls) {
-		if(DEBUG)
-			Log.i(TAG, "MiTask.switchActivity()");
+		if (DEBUG)
+			Log.i(TAG, "MiTask.switchActivity(), cls = " + cls.getName());
 		switchActivity(packageContext, cls, null);
 	}
 
@@ -214,7 +244,8 @@ final public class MiTask extends Activity {
 	 */
 	public static void switchActivity(Context packageContext, Class<?> cls, Bundle bundle) {
 		if (DEBUG)
-			Log.i(TAG, "MiTask.switchActivity()");
+			Log.i(TAG, "MiTask.switchActivity(), cls = " + cls.getName() + ", bundle = "
+					+ (bundle == null ? "null" : bundle.toString()));
 		Intent intent = new Intent(packageContext, MiTask.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP
 				| Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -229,7 +260,7 @@ final public class MiTask extends Activity {
 	 * @param packageContext A Context of the application package implementing this class.
 	 */
 	public static void exitTask(Context packageContext) {
-		if(DEBUG)
+		if (DEBUG)
 			Log.i(TAG, "MiTask.exitTask()");
 		switchActivity(packageContext, MiTask.class);
 	}
@@ -240,7 +271,7 @@ final public class MiTask extends Activity {
 	 * @param packageContext A Context of the application package implementing this class.
 	 */
 	public static void reStart(Context packageContext) {
-		if(DEBUG)
+		if (DEBUG)
 			Log.i(TAG, "MiTask.reStart()");
 		switchActivity(packageContext, null);
 	}
@@ -254,7 +285,7 @@ final public class MiTask extends Activity {
 		Intent intent = new Intent(DEFAULT_LAUNCH_ACTIVITY);
 		List<ResolveInfo> resolveInfos = this.getPackageManager().queryIntentActivities(intent,
 				PackageManager.GET_RESOLVED_FILTER);
-		if (resolveInfos.size() != 1) {
+		if (resolveInfos.size() < 1) {
 			try {
 				PackageItemInfo activityInfo = getPackageManager().getActivityInfo(getComponentName(),
 						PackageManager.GET_META_DATA);
