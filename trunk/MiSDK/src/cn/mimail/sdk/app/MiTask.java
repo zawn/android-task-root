@@ -82,7 +82,7 @@ import android.util.Log;
 final public class MiTask extends Activity {
 
 	private static final String TAG = "MiTask.java";
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 
 	public static final String DEFAULT_LAUNCH_ACTIVITY 	= "cn.mimail.intent.action.MAIN";			// intent 数据名, 默认的需要启动的Activity
 	public static final String CURRENT_LAUNCH_ACTIVITY 	= "cn.mimail.intent.action.CURRENT_LAUNCH";	// intent 数据名, 需要启动的目标Activity
