@@ -1,5 +1,5 @@
 /*
- * Name   RootActivity.java
+ * Name   MiTask.java
  * Author Zawn
  * Created on 2012-10-22, 上午11:57:58
  *
@@ -8,13 +8,18 @@
  */
 package cn.mimail.sdk.app;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageItemInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -48,13 +53,16 @@ final public class MiTask extends Activity {
 
 	private static final String TAG = "MiTask.java";
 	private static final boolean DEBUG = true;
-	private static final String DEFAULT_LAUNCH_ACTIVITY	= "cn.mimail.DEFAULT_LAUNCH_ACTIVITY";	// intent 数据名, 默认的需要启动的Activity	
-	private static final String CURRENT_LAUNCH_ACTIVITY	= "cn.mimail.CURRENT_LAUNCH_ACTIVITY";	// intent 数据名, 需要启动的目标Activity
+	
+	public static final String DEFAULT_LAUNCH_ACTIVITY 	= "cn.mimail.DEFAULT_LAUNCH_ACTIVITY";	// intent 数据名, 默认的需要启动的Activity
+	public static final String CURRENT_LAUNCH_ACTIVITY 	= "cn.mimail.CURRENT_LAUNCH_ACTIVITY";	// intent 数据名, 需要启动的目标Activity
+	public static final String BUNDLE_DATA				= "cn.mimail.BUNDLE_DATA";				// intent 数据名, 启动Activity是需附带的参数
+	
+	private static final String DEFAULT_LAUNCH_INTENT 	= "cn.mimail.DEFAULT_LAUNCH_INTENT";	// intent 数据名, 默认的需要启动的Activity
 	private static final String ORIGINAL_INTENT 		= "cn.mimail.ORIGINAL_INTENT";			// intent 数据名, 该实例接收到的前一个Intent对象
-	private static final String BUNDLE_DATA 			= "cn.mimail.BUNDLE_DATA";				// intent 数据名, 启动Activity是需附带的参数
 	private static boolean mIsNewIntent;	// 标识该intent是否是新的Intent
 	private boolean mInitiativeDestroy;		// 标识是否需要主动销毁自己
-	private static Class<?> clazz;			// 需要启动的默认的Activity
+	private static Intent mDefaultLaunchInent;			// 需要启动的默认的Activity
 
 	private void onHandleIntent(final Intent intent) {
 		if (DEBUG)
@@ -62,12 +70,12 @@ final public class MiTask extends Activity {
 		final Class<?> cls = (Class<?>) intent.getSerializableExtra(CURRENT_LAUNCH_ACTIVITY);
 		final Bundle bundle = (Bundle) intent.getBundleExtra(BUNDLE_DATA);
 		if (DEBUG)
-			Log.i(TAG, "Target class is:" + ((cls == null) ? "null" : cls.getName()));
+			Log.i(TAG, "MiTask.Target class is : " + ((cls == null) ? "null" : cls.getName()));
 		final Intent i;
 		if (cls == null) {
 			if (DEBUG)
-				Log.i(TAG, "Start the default activity :" + clazz.getName());
-			i = new Intent(this, clazz);
+				Log.i(TAG, "MiTask.Start the default activity : " + mDefaultLaunchInent.getComponent());
+			i = mDefaultLaunchInent.cloneFilter();
 			if (bundle != null) {
 				i.putExtras(bundle);
 			}
@@ -105,9 +113,9 @@ final public class MiTask extends Activity {
 			// 2,程序通过Intent启动该Activity.
 			mIsNewIntent = false;
 			setIntent((Intent) savedInstanceState.getParcelable(ORIGINAL_INTENT));
-			clazz = (Class<?>) savedInstanceState.getSerializable(DEFAULT_LAUNCH_ACTIVITY);
+			mDefaultLaunchInent = (Intent) savedInstanceState.getParcelable(DEFAULT_LAUNCH_INTENT);
 		} else {
-			clazz = this.getDefaultLaunchActivity();
+			mDefaultLaunchInent = this.getDefaultLaunchIntent();
 			// 新的TaskRoot实例,是第一次接收到该Intent,所以置位为true
 			mIsNewIntent = true;
 			// 这是一个新的TaskRoot实例,执行默认的操作
@@ -126,7 +134,7 @@ final public class MiTask extends Activity {
 			if (DEBUG)
 				Log.i(TAG, "MiTask.java Terminate this instance");
 			android.os.Process.killProcess(android.os.Process.myPid());
-			// 接下来的所有逻辑将不会被执行,包括上一个Activity的onStop和onDestroy方法
+			// 接下来的所有逻辑将不会被执行,有可能包括上一个Activity的onStop和onDestroy方法
 		}
 	}
 
@@ -150,9 +158,10 @@ final public class MiTask extends Activity {
 				Log.i(TAG, "mIsNewIntent = true");
 			mIsNewIntent = false;
 		} else {
-			// 说明该Intent不是新传入的,即是通过返回键返回到该实例的,这时候Task中只有该实例了,应终止程序.
+			// 说明该Intent不是新传入的,这时候的返回栈中已经没有其他的Activity了,即Task中只有该实例了,应终止程序.
 			if (DEBUG)
-				Log.i(TAG, "mIsNewIntent = false,Intent is not a new incoming, namely user presses the Back key to return to this instance, should terminate the program at this time.");
+				Log.i(TAG,
+						"mIsNewIntent = false,Intent is not a new incoming, Back stack has no other Activity, should terminate the program at this time.");
 			initiativeDestroy();
 		}
 	}
@@ -162,7 +171,7 @@ final public class MiTask extends Activity {
 		if (DEBUG)
 			Log.i(TAG, "MiTask.onSaveInstanceState()");
 		outState.putParcelable(ORIGINAL_INTENT, getIntent());
-		outState.putSerializable(DEFAULT_LAUNCH_ACTIVITY, clazz);
+		outState.putParcelable(DEFAULT_LAUNCH_INTENT, mDefaultLaunchInent);
 		super.onSaveInstanceState(outState);
 	}
 
@@ -187,6 +196,8 @@ final public class MiTask extends Activity {
 	 * @param cls The component class that is to be used for the intent.
 	 */
 	public static void switchActivity(Context packageContext, Class<?> cls) {
+		if(DEBUG)
+			Log.i(TAG, "MiTask.switchActivity()");
 		switchActivity(packageContext, cls, null);
 	}
 
@@ -202,8 +213,11 @@ final public class MiTask extends Activity {
 	 * @param bundle To attach to the intent of the parameters
 	 */
 	public static void switchActivity(Context packageContext, Class<?> cls, Bundle bundle) {
+		if (DEBUG)
+			Log.i(TAG, "MiTask.switchActivity()");
 		Intent intent = new Intent(packageContext, MiTask.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP
+				| Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.putExtra(CURRENT_LAUNCH_ACTIVITY, cls);
 		intent.putExtra(BUNDLE_DATA, bundle);
 		packageContext.startActivity(intent);
@@ -215,6 +229,8 @@ final public class MiTask extends Activity {
 	 * @param packageContext A Context of the application package implementing this class.
 	 */
 	public static void exitTask(Context packageContext) {
+		if(DEBUG)
+			Log.i(TAG, "MiTask.exitTask()");
 		switchActivity(packageContext, MiTask.class);
 	}
 
@@ -224,29 +240,39 @@ final public class MiTask extends Activity {
 	 * @param packageContext A Context of the application package implementing this class.
 	 */
 	public static void reStart(Context packageContext) {
+		if(DEBUG)
+			Log.i(TAG, "MiTask.reStart()");
 		switchActivity(packageContext, null);
 	}
 
 	/**
 	 * 返回默认的需要启动的Activity
 	 */
-	private Class<?> getDefaultLaunchActivity(){
+	private Intent getDefaultLaunchIntent() {
 		if (DEBUG)
-			Log.i(TAG, "MiTask.getDefaultLaunchActivity()");
-			PackageItemInfo activityInfo;
+			Log.i(TAG, "MiTask.getDefaultLaunchIntent()");
+		Intent intent = new Intent(DEFAULT_LAUNCH_ACTIVITY);
+		List<ResolveInfo> resolveInfos = this.getPackageManager().queryIntentActivities(intent,
+				PackageManager.GET_RESOLVED_FILTER);
+		if (resolveInfos.size() != 1) {
 			try {
-				activityInfo = getPackageManager().getActivityInfo(getComponentName(), PackageManager.GET_META_DATA);
+				PackageItemInfo activityInfo = getPackageManager().getActivityInfo(getComponentName(),
+						PackageManager.GET_META_DATA);
 				String activityName = activityInfo.metaData.getString(DEFAULT_LAUNCH_ACTIVITY);
 				if (activityName != null) {
-					return Class.forName(activityName);
-				}			
+					if (activityName.startsWith(".")) {
+						activityName = getPackageName() + activityName;
+					}
+					intent.setClassName(getApplicationContext(), activityName);
+				} else {
+					throw new RuntimeException(
+							"MiTask did not find the default to launch Activity, make sure you provide the name of the class is correct and complete");
+				}
 			} catch (NameNotFoundException e) {
 				throw new RuntimeException(
 						"MiTask did not find the default to launch Activity, make sure you have configured <meta-data> correctly in the AndroidManifest.xml");
-			} catch (ClassNotFoundException e) {
-				throw new RuntimeException(
-						"MiTask did not find the default to launch Activity, make sure you provide the name of the class is correct and complete");
 			}
-		return null;
+		}
+		return intent;
 	}
 }
