@@ -22,13 +22,23 @@
 
             <meta-data
                 android:name="cn.mimail.DEFAULT_LAUNCH_ACTIVITY"
-                android:value="com.example.t1.Activity1" />
+                android:value=".Activity1" />
         </activity>
-        <activity android:name=".Activity1" />
-        <activity android:name=".Activity2" />
-        <activity android:name=".Activity3" />
-        <activity android:name=".Activity4" />
-        <activity android:name=".Activity5" />
+        <activity
+            android:name=".Activity1"
+            android:label="Activity1" />
+        <activity
+            android:name=".Activity2"
+            android:label="Activity2" />
+        <activity
+            android:name=".Activity3"
+            android:label="Activity3" />
+        <activity
+            android:name=".Activity4"
+            android:label="Activity4" />
+        <activity
+            android:name=".Activity5"
+            android:label="Activity5" />
         <activity
             android:name=".DialogActivity"
             android:theme="@android:style/Theme.Dialog" />

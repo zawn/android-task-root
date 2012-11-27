@@ -1,62 +1,43 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:orientation="vertical" >
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/activity5_button_satart_a4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="循环" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="45dp"
-        android:text="Acitivity_5"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/button1"
-        android:text="切换到Activity2" />
-
-    <Button
-        android:id="@+id/button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/button2"
-        android:text="清空并返回MainActivity" />
-
-    <Button
-        android:id="@+id/button_satart_a4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/button1"
-        android:layout_centerHorizontal="true"
+        android:onClick="onButtonClick"
         android:text="启动Activity_4" />
 
     <Button
-        android:id="@+id/button_exit"
+        android:id="@+id/activity5_button_switch_2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button_satart_a4"
-        android:layout_centerHorizontal="true"
-        android:text="退出程序" />
+        android:onClick="onButtonClick"
+        android:text="切换到Activity2" />
 
     <Button
-        android:id="@+id/button_log"
+        android:id="@+id/activity5_button_start_a1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/button"
-        android:layout_centerHorizontal="true"
-        android:text="Button" />
+        android:onClick="onButtonClick"
+        android:text="循环" />
 
-</RelativeLayout>
+    <Button
+        android:id="@+id/activity5_button_manual_clear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onButtonClick"
+        android:text="清空并退出" />
+
+    <Button
+        android:id="@+id/activity5_button_exit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onButtonClick"
+        android:text="退出程序" />
+
+</LinearLayout>

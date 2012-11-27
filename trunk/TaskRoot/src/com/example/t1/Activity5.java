@@ -27,107 +27,6 @@ public class Activity5 extends Activity {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main5);
-		Button button = (Button) findViewById(R.id.button);
-		button.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(Activity5.this, MiTask.class);
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-				startActivity(intent);
-			}
-		});
-		Button button1 = (Button) findViewById(R.id.button1);
-		button1.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(Activity5.this, Activity1.class);
-				startActivity(intent);
-			}
-		});
-		Button button2 = (Button) findViewById(R.id.button2);
-		button2.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// TaskRoot.switchActivity(Activity5.this, Activity2.class);
-				Bundle bundle = new Bundle();
-				bundle.putCharSequence("zawn", "This is bundle data");
-				startActivity(new Intent(Activity5.this, Activity6.class));
-			}
-		});
-		Button button_satart_a4 = (Button) findViewById(R.id.button_satart_a4);
-		button_satart_a4.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// Intent intent = new Intent(Activity5.this, Activity4.class);
-				// startActivity(intent);
-				try {
-					Log.i(TAG, "MyApp.getInstance()1" + MyApp.getDefaultActivityClass().toString());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				try {
-					Log.i(TAG, "MyApp.getInstance()2" + Profile.getZhang());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				try {
-					Log.i(TAG, "MyApp.getInstance()3" + MyApp.getInstance());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				try {
-					Log.i(TAG, "MyApp.getInstance()4" + Profile.getZhang());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				try {
-					Log.i(TAG, "MyApp.getInstance()5" + ((MyApp) MyApp.getInstance()).profiles);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		Button button_log = (Button) findViewById(R.id.button_log);
-		button_log.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// Intent intent = new Intent(Activity5.this, Activity4.class);
-				// startActivity(intent);
-				MyApp.setDefaultActivityClass(Activity1.class);
-				Profile.setZhang("zhangzhenli");
-				MyApp.setProfile(new Profile());
-				try {
-					Log.i(TAG, "MyApp.getInstance()1" + MyApp.getDefaultActivityClass().toString());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				try {
-					Log.i(TAG, "MyApp.getInstance()2" + MyApp.getInstance());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				try {
-					Log.i(TAG, "MyApp.getInstance()3" + Profile.getZhang());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-			}
-		});
-		Button button_exit = (Button) findViewById(R.id.button_exit);
-		button_exit.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				MiTask.exitTask(Activity5.this);
-			}
-		});
 	}
 
 	@Override
@@ -190,5 +89,34 @@ public class Activity5 extends Activity {
 	protected void onStop() {
 		super.onStop();
 		Log.i(TAG, "onStop");
+	}
+
+	public void onButtonClick(View v) {
+		Intent intent = null;
+		switch (v.getId()) {
+		case R.id.activity5_button_exit:
+			MiTask.exitTask(getApplicationContext());
+			break;
+		case R.id.activity5_button_start_a1:
+			intent = new Intent(Activity5.this, Activity1.class);
+			startActivity(intent);
+			break;
+		case R.id.activity5_button_satart_a4:
+			intent = new Intent(Activity5.this, Activity4.class);
+			startActivity(intent);
+			break;
+		case R.id.activity5_button_switch_2:
+			MiTask.switchActivity(getApplicationContext(), Activity2.class);
+		case R.id.activity5_button_manual_clear:
+			intent = new Intent(getApplicationContext(), MiTask.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+			intent.putExtra(MiTask.CURRENT_LAUNCH_ACTIVITY, MiTask.class);
+			startActivity(intent);
+			break;
+		default:
+			Log.e(TAG, "Activity5.onButtonClick() Did not match the Id!");
+			break;
+		}
 	}
 }
