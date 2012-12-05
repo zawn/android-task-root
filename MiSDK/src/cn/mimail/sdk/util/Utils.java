@@ -7,15 +7,20 @@ import java.util.List;
 
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.ActivityManager.RunningTaskInfo;
+import android.app.KeyguardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
+import cn.mimail.sdk.exception.PermissionException;
 
 public class Utils {
+
+	private static final String TAG = "Utils.java";
 
 	/**
 	 * 私有构造函数,禁止创建实例.
@@ -249,13 +254,22 @@ public class Utils {
 	 * @param context
 	 * @return true:程序处于前台运行,false:Activity未处于前台状态
 	 */
-	public static boolean isApplicationForeground(final Context context) {
-		ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-		List<RunningTaskInfo> tasks = am.getRunningTasks(1);
-		if (!tasks.isEmpty()) {
-			ComponentName topActivity = tasks.get(0).topActivity;
-			if (topActivity.getPackageName().equals(context.getPackageName())) {
-				return true;
+	public static boolean isApplicationForeground(final Context context) throws PermissionException {
+		try {
+			ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+			List<RunningTaskInfo> tasks = am.getRunningTasks(1);
+			if (!tasks.isEmpty()) {
+				ComponentName topActivity = tasks.get(0).topActivity;
+				if (topActivity.getPackageName().equals(context.getPackageName())) {
+					return true;
+				}
+			}
+		} catch (SecurityException e) {
+			Log.e(TAG, e.getMessage() + " Try to complete without permission");
+			try {
+				return isApplicationForegroundWithoutPermissions(context);
+			} catch (UnsupportedOperationException e2) {
+				throw new PermissionException(e);
 			}
 		}
 		return false;
@@ -269,14 +283,56 @@ public class Utils {
 	 * @param context
 	 * @return true:Activity处于前台运行,false:Activity未处于前台状态
 	 */
-	public static boolean isActivityForeground(final Context context, Class<?> cls) {
-		ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-		List<RunningTaskInfo> tasks = am.getRunningTasks(1);
-		if (!tasks.isEmpty()) {
-			ComponentName topActivity = tasks.get(0).topActivity;
-			if (topActivity.getClassName().equals(cls.getName())) {
-				return true;
+	public static boolean isActivityForeground(final Context context, Class<?> cls) throws PermissionException{
+		try {
+			ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+			List<RunningTaskInfo> tasks = am.getRunningTasks(1);
+			if (!tasks.isEmpty()) {
+				ComponentName topActivity = tasks.get(0).topActivity;
+				if (topActivity.getClassName().equals(cls.getName())) {
+					return true;
+				}
 			}
+		} catch (SecurityException e) {
+			Log.e(TAG, e.getMessage() + " Try to complete without permission");
+			throw new PermissionException(e);
+		}
+		return false;
+	}
+
+	/**
+	 * 判断content给定的程序是否处于前台<br />
+	 * 注意:运行此方法不需要权限，但是比{@code isApplicationForeground}耗费更多时间
+	 * 
+	 * @return true 在前台; false 在后台
+	 */
+	public static boolean isApplicationForegroundWithoutPermissions(final Context context) throws UnsupportedOperationException {
+		ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+		KeyguardManager km = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+		boolean isspecial = true;
+		String packageName = context.getPackageName();
+		List<RunningAppProcessInfo> appProcesses = am.getRunningAppProcesses();
+		if (appProcesses == null)
+			return false;
+		for (RunningAppProcessInfo appProcess : appProcesses) {
+			if (appProcess.processName.equals(packageName)) {
+				if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND
+						|| appProcess.importance == RunningAppProcessInfo.IMPORTANCE_VISIBLE) {
+					return true;
+				}
+				if (km.inKeyguardRestrictedInputMode())
+					return true;
+			}
+			if (isspecial) {
+				if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+					isspecial = false;
+				}
+			}
+		}
+		if (isspecial) {
+			Log.e(TAG,
+					"Utils.isApplicationForegroundWithoutPermissions():The system is unable to obtain accurate information and return false");
+			throw new UnsupportedOperationException("The system is unable to obtain accurate information");
 		}
 		return false;
 	}
