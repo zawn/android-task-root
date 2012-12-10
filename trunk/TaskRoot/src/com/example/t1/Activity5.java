@@ -107,6 +107,7 @@ public class Activity5 extends Activity {
 			break;
 		case R.id.activity5_button_switch_2:
 			MiTask.switchActivity(getApplicationContext(), Activity2.class);
+			break;
 		case R.id.activity5_button_manual_clear:
 			intent = new Intent(getApplicationContext(), MiTask.class);
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

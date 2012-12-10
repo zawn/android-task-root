@@ -21,7 +21,7 @@
             </intent-filter>
 
             <meta-data
-                android:name="cn.mimail.DEFAULT_LAUNCH_ACTIVITY"
+                android:name="cn.mimail.intent.action.MAIN"
                 android:value=".Activity1" />
         </activity>
         <activity
