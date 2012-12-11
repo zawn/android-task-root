@@ -3,7 +3,7 @@
  * Author Zawn
  * Created on 2012-10-22, 上午11:57:58
  *
- * Copyright (c) 2012 NanJing YiWuXian Network Technology Co., Ltd. All rights reserved
+ * Copyright (c) 2012. All rights reserved
  *
  */
 package cn.mimail.sdk.app;
