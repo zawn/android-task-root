@@ -132,8 +132,8 @@ final public class MiTask extends Activity {
 			Log.i(TAG, "MiTask.onCreate() TaskId:" + this.getTaskId());
 		super.onCreate(savedInstanceState);
 		if (!isTaskRoot()) {
-			throw new RuntimeException(
-					"MiTask is not the root of this task.");
+			Log.e(TAG, "MiTask is not the root of this task. Please confirm the code correctly");
+			finish();
 		}
 
 		if (savedInstanceState != null) {
@@ -284,9 +284,6 @@ final public class MiTask extends Activity {
 		if (DEBUG)
 			Log.i(TAG, "MiTask.getDefaultLaunchIntent()");
 		mDefaultLaunchActivity = this.getPackageName() + DEFAULT_LAUNCH_ACTIVITY;
-		mDefaultLaunchActivity = "cn.mimail.intent.action.MAIN";
-		if (DEBUG)
-			Log.i(TAG, mDefaultLaunchActivity);
 		String activityName = null;
 		Intent intent = new Intent(getIntent());		
 		try {
@@ -316,8 +313,8 @@ final public class MiTask extends Activity {
 			throw new RuntimeException(
 					"MiTask did not find the default to launch Activity, make sure you provide the name of the class is correct and complete");
 		}
-		Log.i(TAG, getIntent().toString());
-		Log.i(TAG, intent.toString());
+		if (DEBUG) 
+			Log.i(TAG, intent.toString());
 		return intent;
 	}
 }
