@@ -19,14 +19,16 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
-            <meta-data
-                android:name="cn.mimail.intent.action.MAIN"
-                android:value=".Activity1" />
         </activity>
         <activity
             android:name=".Activity1"
-            android:label="Activity1" />
+            android:label="Activity1" >
+            <intent-filter>
+                <action android:name="com.example.t1.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".Activity2"
             android:label="Activity2" />
