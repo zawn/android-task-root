@@ -25,7 +25,7 @@ public class Activity1 extends Activity {
 		Log.d(TAG, "TaskId:" + this.getTaskId());
 
 		if (!isTaskRoot()) {
-			Log.e(TAG, "MiTask is not the root of this task.  The root is the first activity in a task.");
+			Log.i(TAG, "Activity1 is not the root of this task.");
 		}
 
 		super.onCreate(savedInstanceState);

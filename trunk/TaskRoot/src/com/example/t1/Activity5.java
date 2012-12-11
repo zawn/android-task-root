@@ -106,7 +106,7 @@ public class Activity5 extends Activity {
 			startActivity(intent);
 			break;
 		case R.id.activity5_button_switch_2:
-			MiTask.switchActivity(getApplicationContext(), Activity2.class);
+			MiTask.switchActivity(this, Activity2.class);
 			break;
 		case R.id.activity5_button_manual_clear:
 			intent = new Intent(getApplicationContext(), MiTask.class);
