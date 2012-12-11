@@ -12,7 +12,7 @@ import android.widget.Button;
 public class Activity1 extends Activity {
 
 	private static final String TAG = "Activity1";
-	
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		Log.d(TAG, "onActivityResult");
@@ -23,6 +23,10 @@ public class Activity1 extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		Log.d(TAG, "onCreate");
 		Log.d(TAG, "TaskId:" + this.getTaskId());
+
+		if (!isTaskRoot()) {
+			Log.e(TAG, "MiTask is not the root of this task.  The root is the first activity in a task.");
+		}
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main1);
