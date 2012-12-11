@@ -41,7 +41,7 @@ import android.util.Log;
  * 	 android:name=".MainActivity"
  * 	 android:permission="YOUR_PERMISSION" >
  * 	 <intent-filter>
- * 		 <action android:name="cn.mimail.intent.action.MAIN" />
+ * 		 <action android:name="YOUR_PACKNAME.intent.action.MAIN" />
  * 
  * 		 <category android:name="android.intent.category.DEFAULT" />
  * 	 </intent-filter>
@@ -65,35 +65,37 @@ import android.util.Log;
  * 	 </intent-filter>
  * 
  * 	 <meta-data
- * 		 android:name="cn.mimail.intent.action.MAIN"
+ * 		 android:name="YOUR_PACKNAME.intent.action.MAIN"
  * 		 android:value=".MainActivity" />
  *  </activity>
  * }
  * </pre>
  * <p>
  * 其中.MainActivity为程序需要启动的第一个Activity.<br>
- * 如果在AndroidManifest.xml中同时存在上述两种声明方式,则会忽略第二种声明.
+ * 如果在AndroidManifest.xml中同时存在上述两种声明方式,则会忽略第一种声明.
  * 
  * @author Zawn
  */
 final public class MiTask extends Activity {
 
 	private static final String TAG = "MiTask.java";
-	private static final boolean DEBUG = false;
+	private static final boolean DEBUG = true;
 
-	public static final String DEFAULT_LAUNCH_ACTIVITY 	= "cn.mimail.intent.action.MAIN";			// intent 数据名, 默认的需要启动的Activity
-	public static final String CURRENT_LAUNCH_ACTIVITY 	= "cn.mimail.intent.action.CURRENT_LAUNCH";	// intent 数据名, 需要启动的目标Activity
+	public static final String DEFAULT_LAUNCH_ACTIVITY 	= ".intent.action.MAIN";			// intent 动作名, 默认的需要启动的Activity
+	
+	public static final String CURRENT_LAUNCH_ACTIVITY 	= "cn.mimail.intent.data.CURRENT_LAUNCH";	// intent 数据名, 需要启动的目标Activity
 	public static final String BUNDLE_DATA 				= "cn.mimail.intent.data.BUNDLE_DATA";		// intent 数据名, 启动Activity是需附带的参数
 
-	private static final String DEFAULT_LAUNCH_INTENT 	= "cn.mimail.DEFAULT_LAUNCH_INTENT";		// intent 数据名, 默认的需要启动的Activity
-	private static final String ORIGINAL_INTENT 		= "cn.mimail.ORIGINAL_INTENT";				// intent 数据名, 该实例接收到的前一个Intent对象
+	private static final String DEFAULT_LAUNCH_INTENT 	= "cn.mimail.outState.DEFAULT_LAUNCH_INTENT";		// intent 数据名, 默认的需要启动的Activity
+	private static final String ORIGINAL_INTENT 		= "cn.mimail.outState.ORIGINAL_INTENT";				// intent 数据名, 该实例接收到的前一个Intent对象
+	private static String mDefaultLaunchActivity;// intent 数据名, 默认的需要启动的Activity
 	private static boolean mIsNewIntent;	// 标识该intent是否是新的Intent
 	private boolean mInitiativeDestroy;		// 标识是否需要主动销毁自己
 	private static Intent mDefaultLaunchInent;			// 需要启动的默认的Activity
 
 	private void onHandleIntent(final Intent intent) {
 		if (DEBUG)
-			Log.i(TAG, "MiTask.onHandleIntent()");
+			Log.i(TAG, "MiTask.onHandleIntent() TaskId:" + this.getTaskId());
 		final Class<?> cls = (Class<?>) intent.getSerializableExtra(CURRENT_LAUNCH_ACTIVITY);
 		final Bundle bundle = (Bundle) intent.getBundleExtra(BUNDLE_DATA);
 		if (DEBUG)
@@ -127,11 +129,11 @@ final public class MiTask extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		if (DEBUG)
-			Log.i(TAG, "MiTask.onCreate()");
+			Log.i(TAG, "MiTask.onCreate() TaskId:" + this.getTaskId());
 		super.onCreate(savedInstanceState);
 		if (!isTaskRoot()) {
 			throw new RuntimeException(
-					"MiTask is not the root of this task.  The root is the first activity in a task.");
+					"MiTask is not the root of this task.");
 		}
 
 		if (savedInstanceState != null) {
@@ -222,10 +224,10 @@ final public class MiTask extends Activity {
 	 * @param packageContext A Context of the application package implementing this class.
 	 * @param cls The component class that is to be used for the intent.
 	 */
-	public static void switchActivity(Context packageContext, Class<?> cls) {
+	public static void switchActivity(Activity activity, Class<?> cls) {
 		if (DEBUG)
 			Log.i(TAG, "MiTask.switchActivity(), cls = " + cls.getName());
-		switchActivity(packageContext, cls, null);
+		switchActivity(activity, cls, null);
 	}
 
 	/**
@@ -239,16 +241,15 @@ final public class MiTask extends Activity {
 	 * @param cls The component class that is to be used for the intent,If NUll default components will be started
 	 * @param bundle To attach to the intent of the parameters
 	 */
-	public static void switchActivity(Context packageContext, Class<?> cls, Bundle bundle) {
+	public static void switchActivity(Activity activity, Class<?> cls, Bundle bundle) {
 		if (DEBUG)
 			Log.i(TAG, "MiTask.switchActivity(), cls = " + cls.getName() + ", bundle = "
 					+ (bundle == null ? "null" : bundle.toString()));
-		Intent intent = new Intent(packageContext, MiTask.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP
-				| Intent.FLAG_ACTIVITY_NEW_TASK);
+		Intent intent = new Intent(activity, MiTask.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		intent.putExtra(CURRENT_LAUNCH_ACTIVITY, cls);
 		intent.putExtra(BUNDLE_DATA, bundle);
-		packageContext.startActivity(intent);
+		activity.startActivity(intent);
 	}
 
 	/**
@@ -256,10 +257,13 @@ final public class MiTask extends Activity {
 	 * 
 	 * @param packageContext A Context of the application package implementing this class.
 	 */
-	public static void exitTask(Context packageContext) {
+	public static void exitTask(Context context) {
 		if (DEBUG)
 			Log.i(TAG, "MiTask.exitTask()");
-		switchActivity(packageContext, MiTask.class);
+		Intent intent = new Intent(context, MiTask.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		intent.putExtra(CURRENT_LAUNCH_ACTIVITY, MiTask.class);
+		context.startActivity(intent);
 	}
 
 	/**
@@ -267,10 +271,10 @@ final public class MiTask extends Activity {
 	 * 
 	 * @param packageContext A Context of the application package implementing this class.
 	 */
-	public static void reStart(Context packageContext) {
+	public static void reStart(Activity activity) {
 		if (DEBUG)
 			Log.i(TAG, "MiTask.reStart()");
-		switchActivity(packageContext, null);
+		switchActivity(activity, null);
 	}
 
 	/**
@@ -279,28 +283,41 @@ final public class MiTask extends Activity {
 	private Intent getDefaultLaunchIntent() {
 		if (DEBUG)
 			Log.i(TAG, "MiTask.getDefaultLaunchIntent()");
-		Intent intent = new Intent(DEFAULT_LAUNCH_ACTIVITY);
-		List<ResolveInfo> resolveInfos = this.getPackageManager().queryIntentActivities(intent,
-				PackageManager.GET_RESOLVED_FILTER);
-		if (resolveInfos.size() < 1) {
-			try {
-				PackageItemInfo activityInfo = getPackageManager().getActivityInfo(getComponentName(),
-						PackageManager.GET_META_DATA);
-				String activityName = activityInfo.metaData.getString(DEFAULT_LAUNCH_ACTIVITY);
-				if (activityName != null) {
-					if (activityName.startsWith(".")) {
-						activityName = getPackageName() + activityName;
-					}
-					intent.setClassName(getApplicationContext(), activityName);
-				} else {
-					throw new RuntimeException(
-							"MiTask did not find the default to launch Activity, make sure you provide the name of the class is correct and complete");
+		mDefaultLaunchActivity = this.getPackageName() + DEFAULT_LAUNCH_ACTIVITY;
+		mDefaultLaunchActivity = "cn.mimail.intent.action.MAIN";
+		if (DEBUG)
+			Log.i(TAG, mDefaultLaunchActivity);
+		String activityName = null;
+		Intent intent = new Intent(getIntent());		
+		try {
+			PackageItemInfo activityInfo = getPackageManager().getActivityInfo(getComponentName(),
+					PackageManager.GET_META_DATA);
+			if (activityInfo.metaData != null) {
+				activityName = activityInfo.metaData.getString(mDefaultLaunchActivity);
+			}
+		} catch (NameNotFoundException e) {
+		}
+		if (activityName == null) {
+			Intent temp = new Intent(mDefaultLaunchActivity);
+			List<ResolveInfo> resolveInfos = this.getPackageManager().queryIntentActivities(temp,
+					PackageManager.GET_RESOLVED_FILTER);
+			for (ResolveInfo resolveInfo : resolveInfos) {
+				if (resolveInfo.activityInfo.packageName.equals(this.getPackageName())) {
+					activityName = resolveInfo.activityInfo.name;
 				}
-			} catch (NameNotFoundException e) {
-				throw new RuntimeException(
-						"MiTask did not find the default to launch Activity, make sure you have configured <meta-data> correctly in the AndroidManifest.xml");
 			}
 		}
+		if (activityName != null && activityName.startsWith(".")) {
+			activityName = getPackageName() + activityName;
+		}
+		if (activityName != null) {
+			intent.setClassName(getApplicationContext(), activityName);
+		} else {
+			throw new RuntimeException(
+					"MiTask did not find the default to launch Activity, make sure you provide the name of the class is correct and complete");
+		}
+		Log.i(TAG, getIntent().toString());
+		Log.i(TAG, intent.toString());
 		return intent;
 	}
 }
