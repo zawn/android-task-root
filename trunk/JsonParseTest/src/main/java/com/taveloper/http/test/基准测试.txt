@@ -1,0 +1,21 @@
+ 0% Scenario{vm=java, trial=0, benchmark=GsonStreamParser} 11479.00 ns; 考=336.45 ns @ 10 trials
+33% Scenario{vm=java, trial=0, benchmark=JacksonStreamParser} 13710.87 ns; 考=498.76 ns @ 10 trials
+67% Scenario{vm=java, trial=0, benchmark=JacksonDataBind} 34488.56 ns; 考=1493.51 ns @ 10 trials
+
+          benchmark   us linear runtime
+   GsonStreamParser 11.5 =========
+JacksonStreamParser 13.7 ===========
+    JacksonDataBind 34.5 ==============================
+	
+	
+	
+ 0% Scenario{vm=java, trial=0, benchmark=GsonStreamParser} 11009.70 ns; 考=25.50 ns @ 3 trials
+25% Scenario{vm=java, trial=0, benchmark=Jackson1StreamParser} 9948.75 ns; 考=57.78 ns @ 3 trials
+50% Scenario{vm=java, trial=0, benchmark=Jackson2StreamParser} 9950.96 ns; 考=72.96 ns @ 3 trials
+75% Scenario{vm=java, trial=0, benchmark=JacksonDataBind} 33030.42 ns; 考=487.61 ns @ 10 trials
+
+           benchmark    us linear runtime
+    GsonStreamParser 11.01 =========
+Jackson1StreamParser  9.95 =========
+Jackson2StreamParser  9.95 =========
+     JacksonDataBind 33.03 ==============================
