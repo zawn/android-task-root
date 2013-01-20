@@ -71,11 +71,11 @@ public final class ParseBenchmark extends SimpleBenchmark {
         return new JacksonStreamParser();
       }
     },
-    JACKSON_BIND {
-      @Override Parser newParser() {
-        return new JacksonBindParser();
-      }
-    },
+//    JACKSON_BIND {
+//      @Override Parser newParser() {
+//        return new JacksonBindParser();
+//      }
+//    },
     GSON_STREAM {
       @Override Parser newParser() {
         return new GsonStreamParser();
@@ -90,11 +90,11 @@ public final class ParseBenchmark extends SimpleBenchmark {
       @Override Parser newParser() {
         return new GsonDomParser();
       }
-    },
-    GSON_BIND {
-      @Override Parser newParser() {
-        return new GsonBindParser();
-      }
+//    },
+//    GSON_BIND {
+//      @Override Parser newParser() {
+//        return new GsonBindParser();
+//      }
     };
     abstract Parser newParser();
   }
@@ -103,7 +103,7 @@ public final class ParseBenchmark extends SimpleBenchmark {
   private Parser parser;
 
   @Override protected void setUp() throws Exception {
-    text = resourceToString("/" + document.name() + ".json").toCharArray();
+    text = resourceToString(document.name() + ".json").toCharArray();
     parser = api.newParser();
   }
 
