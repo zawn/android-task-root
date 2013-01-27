@@ -15,8 +15,8 @@
  */
 package com.taveloper.http.test.pojo.gparse;
 
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
+import android.support.json.JsonReader;
+import android.support.json.JsonToken;
 import com.taveloper.http.json.GsonReaderable;
 import com.taveloper.http.test.pojo.ActivityObject;
 import java.io.IOException;

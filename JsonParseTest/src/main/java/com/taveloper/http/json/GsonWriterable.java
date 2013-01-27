@@ -13,13 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.taveloper.http.json;
 
+import java.io.Writer;
+
 /**
+ * 类通过实现 {@link JsonReaderable } 接口以启用其Json序列化功能。
  *
  * @author ZhangZhenli <zhangzhenli@live.com>
  */
-public class GsonWriterable {
+public interface GsonWriterable {
 
+    /**
+     * 将对象序列化到输出流
+     *
+     * @param out 输出流
+     */
+    public void writerJson(Writer out);
 }

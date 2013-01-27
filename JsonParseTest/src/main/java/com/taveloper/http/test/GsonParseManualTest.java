@@ -17,8 +17,8 @@ package com.taveloper.http.test;
 
 import com.google.api.client.json.JsonParser;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
+import android.support.json.JsonReader;
+import android.support.json.JsonToken;
 import static com.taveloper.http.test.App.json;
 import com.taveloper.http.test.pojo.Activity;
 import com.taveloper.http.test.pojo.ActivityFeed;

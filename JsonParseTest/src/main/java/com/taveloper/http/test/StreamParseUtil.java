@@ -18,7 +18,7 @@ package com.taveloper.http.test;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.google.common.base.Preconditions;
-import com.google.gson.stream.JsonReader;
+import android.support.json.JsonReader;
 import java.io.IOException;
 
 /**

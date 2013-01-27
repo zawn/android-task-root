@@ -129,12 +129,12 @@ public class JsonParseMetrics2 extends SimpleBenchmark {
     private static class GsonStreamParser implements Parser {
 
         public void parse(char[] data) throws Exception {
-            com.google.gson.stream.JsonReader jsonReader = new com.google.gson.stream.JsonReader(new CharArrayReader(data));
+            android.support.json.JsonReader jsonReader = new android.support.json.JsonReader(new CharArrayReader(data));
             readToken(jsonReader);
             jsonReader.close();
         }
 
-        private void readToken(com.google.gson.stream.JsonReader reader) throws IOException {
+        private void readToken(android.support.json.JsonReader reader) throws IOException {
             while (true) {
                 switch (reader.peek()) {
                     case BEGIN_ARRAY:

@@ -16,14 +16,14 @@
 
 package com.taveloper.http.json;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.google.gson.stream.JsonReader;
 import java.io.IOException;
 
+import android.support.json.JsonReader;
+
 /**
- * 类通过实现 {@link JsonReaderable } 接口以启用其Json反序列化功能。
+ * 类通过实现 {@link GsonReaderable } 接口以启用其Json反序列化功能。
  *
- * @author ZhangZhenli
+ * @author ZhangZhenli <zhangzhenli@live.com>
  */
 public interface GsonReaderable<T> {
 
