@@ -15,15 +15,6 @@
  */
 package com.taveloper.http.test;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.google.api.client.json.JsonParser;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.caliper.Runner;
-import com.google.caliper.SimpleBenchmark;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.taveloper.http.test.pojo.ActivityFeed;
-import com.taveloper.http.test.pojo.gparse.ActivityFeedParse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +22,17 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import android.support.json.JsonReader;
+import android.support.json.JsonToken;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.google.api.client.json.JsonParser;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.caliper.Runner;
+import com.google.caliper.SimpleBenchmark;
+import com.taveloper.http.test.pojo.ActivityFeed;
+import com.taveloper.http.test.pojo.gparse.ActivityFeedParse;
 
 /**
  *
