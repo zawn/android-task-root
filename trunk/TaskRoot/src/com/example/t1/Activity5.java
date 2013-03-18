@@ -1,14 +1,11 @@
 package com.example.t1;
 
-import cn.mimail.sdk.app.MiTask;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 
 public class Activity5 extends Activity {
 
@@ -95,7 +92,7 @@ public class Activity5 extends Activity {
 		Intent intent = null;
 		switch (v.getId()) {
 		case R.id.activity5_button_exit:
-			MiTask.exitTask(getApplicationContext());
+			InitialActivity.exitTask(getApplicationContext());
 			break;
 		case R.id.activity5_button_start_a1:
 			intent = new Intent(Activity5.this, Activity1.class);
@@ -106,13 +103,13 @@ public class Activity5 extends Activity {
 			startActivity(intent);
 			break;
 		case R.id.activity5_button_switch_2:
-			MiTask.switchActivity(this, Activity2.class);
+			InitialActivity.switchActivity(this, Activity2.class);
 			break;
 		case R.id.activity5_button_manual_clear:
-			intent = new Intent(getApplicationContext(), MiTask.class);
+			intent = new Intent(getApplicationContext(), InitialActivity.class);
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-			intent.putExtra(MiTask.CURRENT_LAUNCH_ACTIVITY, MiTask.class);
+			intent.putExtra(InitialActivity.CURRENT_LAUNCH_ACTIVITY, InitialActivity.class);
 			startActivity(intent);
 			break;
 		default:
