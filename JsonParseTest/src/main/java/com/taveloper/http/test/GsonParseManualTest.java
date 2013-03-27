@@ -15,19 +15,21 @@
  */
 package com.taveloper.http.test;
 
-import com.google.api.client.json.JsonParser;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import android.support.json.JsonReader;
-import android.support.json.JsonToken;
-import static com.taveloper.http.test.App.json;
-import com.taveloper.http.test.pojo.Activity;
-import com.taveloper.http.test.pojo.ActivityFeed;
-import com.taveloper.http.test.pojo.gparse.ActivityFeedParse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+
+import android.support.json.JsonReader;
+import android.support.json.JsonToken;
+
+import com.google.api.client.json.JsonParser;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import static com.taveloper.http.test.App.json;
+import com.taveloper.http.test.pojo.Activity;
+import com.taveloper.http.test.pojo.ActivityFeed;
+import com.taveloper.http.test.pojo.gparse.ActivityFeedParse;
 
 /**
  *

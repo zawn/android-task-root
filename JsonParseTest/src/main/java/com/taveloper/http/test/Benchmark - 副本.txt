@@ -1,0 +1,10 @@
+GET /list-of-registrars/ HTTP/1.1
+Host: registry.pw
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:19.0) Gecko/20100101 Firefox/19.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: zh-cn,zh;q=0.8,en-us;q=0.5,en;q=0.3
+Accept-Encoding: gzip, deflate
+DNT: 1
+Referer: http://registry.pw/domainchecker/
+Cookie: the_cookie=the_value; __utma=146163255.1720719744.1364351585.1364351585.1364351585.1; __utmb=146163255.2.10.1364351585; __utmc=146163255; __utmz=146163255.1364351585.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none)
+Connection: keep-alive
