@@ -132,8 +132,8 @@ final public class InitialActivity extends Activity {
 			Log.i(TAG, "InitialActivity.onCreate() TaskId:" + this.getTaskId());
 		super.onCreate(savedInstanceState);
 		if (!isTaskRoot()) {
-			Log.e(TAG, "InitialActivity is not the root of this task. Please confirm the code correctly");
-			finish();
+			throw new RuntimeException(
+					"InitialActivity is not the root of this task. Please confirm the code correctly.");
 		}
 
 		if (savedInstanceState != null) {
@@ -144,13 +144,45 @@ final public class InitialActivity extends Activity {
 			setIntent((Intent) savedInstanceState.getParcelable(ORIGINAL_INTENT));
 			mDefaultLaunchInent = (Intent) savedInstanceState.getParcelable(DEFAULT_LAUNCH_INTENT);
 		} else {
-			mDefaultLaunchInent = this.getDefaultLaunchIntent();
 			// 新的TaskRoot实例,是第一次接收到该Intent,所以置位为true
 			mIsNewIntent = true;
+			boolean fromLauncher = verifyStartFromLauncher();
+			if (!fromLauncher) {
+				return;
+			}
+			mDefaultLaunchInent = this.getDefaultLaunchIntent();
 			// 这是一个新的TaskRoot实例,执行默认的操作
 			final Intent intent = getIntent();
 			onHandleIntent(intent);
 		}
+	}
+	
+	private boolean verifyStartFromLauncher() {
+		Log.i(TAG, "InitialActivity.verifyStartFromLauncher()");
+		Intent intent = getIntent();
+		Intent other = getLauncherIntent();
+		boolean filterEquals = intent.filterEquals(other);
+		if (filterEquals) {
+			return true;
+		}else {
+			finish();
+			startActivity(other);
+			return false;
+		}
+		
+	}
+
+	/**
+	 * 重新启动程序
+	 */
+	private Intent getLauncherIntent() {
+		Intent intent = new Intent();
+		intent.setAction(Intent.ACTION_MAIN);
+		intent.addCategory(Intent.CATEGORY_LAUNCHER);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		intent.setClass(this, this.getClass());
+		return intent;
 	}
 
 	@Override
