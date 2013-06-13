@@ -131,11 +131,22 @@ final public class InitialActivity extends Activity {
 		if (DEBUG)
 			Log.i(TAG, "InitialActivity.onCreate() TaskId:" + this.getTaskId());
 		super.onCreate(savedInstanceState);
-		if (!isTaskRoot()) {
-			throw new RuntimeException(
-					"InitialActivity is not the root of this task. Please confirm the code correctly.");
-		}
+		// 判断启动当前Activity的Intent是否符合要求
+		boolean expectedIntent = verifyExpectedIntent();
 
+		if (!expectedIntent) {
+			finish();
+			startActivity(getLauncherIntent(getIntent()));
+			return;
+		}
+		
+		if (!isTaskRoot()) {
+			// 已知在App已经启动的时候,再传入一个与当初启动App的Intent的不同的Intent的时候
+			// 当前的Activity会重复启动.
+			Log.e(TAG, "InitialActivity is not the root of this task. Please confirm the code correctly");
+			finish();
+			return;
+		}
 		if (savedInstanceState != null) {
 			// 在低内存的情况下Activity将被销毁,销毁后下面两种操作将触发此条件
 			// 1,用户按返回键重新返回当前Activity,此时程序应该自动退出.
@@ -146,10 +157,6 @@ final public class InitialActivity extends Activity {
 		} else {
 			// 新的TaskRoot实例,是第一次接收到该Intent,所以置位为true
 			mIsNewIntent = true;
-			boolean fromLauncher = verifyStartFromLauncher();
-			if (!fromLauncher) {
-				return;
-			}
 			mDefaultLaunchInent = this.getDefaultLaunchIntent();
 			// 这是一个新的TaskRoot实例,执行默认的操作
 			final Intent intent = getIntent();
@@ -157,31 +164,34 @@ final public class InitialActivity extends Activity {
 		}
 	}
 	
-	private boolean verifyStartFromLauncher() {
-		Log.i(TAG, "InitialActivity.verifyStartFromLauncher()");
-		Intent intent = getIntent();
-		Intent other = getLauncherIntent();
-		boolean filterEquals = intent.filterEquals(other);
-		if (filterEquals) {
-			return true;
-		}else {
-			finish();
-			startActivity(other);
+	/**
+	 * 判断启动当前程序的Intent是否符合预期
+	 * 
+	 * @return 符合预期 true,否则返回 false
+	 */
+	private boolean verifyExpectedIntent() {
+		Log.i(TAG, "InitialActivity.verifyExpectedIntent()");
+		int flags = getIntent().getFlags();
+		if ((flags & Intent.FLAG_ACTIVITY_NEW_TASK) == 0) {
 			return false;
 		}
-		
+		return true;
 	}
 
 	/**
-	 * 重新启动程序
+	 * 用于在启动当前程序的Intent不符合期望形式的的时候生成重新启动当前的活动的Intent
+	 * 
+	 * @param oldIntent 启动当前程序的原Intent
+	 * @return 模拟从程序列表启动的Intent
 	 */
-	private Intent getLauncherIntent() {
+	private Intent getLauncherIntent(Intent oldIntent) {
 		Intent intent = new Intent();
 		intent.setAction(Intent.ACTION_MAIN);
 		intent.addCategory(Intent.CATEGORY_LAUNCHER);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		intent.setClass(this, this.getClass());
+		intent.putExtras(oldIntent);
 		return intent;
 	}
 
