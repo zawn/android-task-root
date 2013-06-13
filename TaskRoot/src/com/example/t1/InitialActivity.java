@@ -263,7 +263,7 @@ final public class InitialActivity extends Activity {
 	 * 注:如果cls指定的{@link Activity}是{@link InitialActivity}本身,因为{@link InitialActivity}是不可见的此<br>
 	 * 时{@link InitialActivity}将自我销毁,程序退出.
 	 * 
-	 * @param packageContext A Context of the application package implementing this class.
+	 * @param activity A Context of the application package implementing this class.
 	 * @param cls The component class that is to be used for the intent.
 	 */
 	public static void switchActivity(Activity activity, Class<?> cls) {
@@ -279,7 +279,7 @@ final public class InitialActivity extends Activity {
 	 * 注:如果cls指定的{@link Activity}是{@link InitialActivity}本身,因为{@link InitialActivity}是不可见的此<br>
 	 * 时{@link InitialActivity}将自我销毁,程序退出.
 	 * 
-	 * @param packageContext A Context of the application package implementing this class.
+	 * @param activity A Context of the application package implementing this class.
 	 * @param cls The component class that is to be used for the intent,If NUll default components will be started
 	 * @param bundle To attach to the intent of the parameters
 	 */
@@ -311,7 +311,7 @@ final public class InitialActivity extends Activity {
 	/**
 	 * 重新启动软件,注意,该重启方法并不能销毁Application对象,
 	 * 
-	 * @param packageContext A Context of the application package implementing this class.
+	 * @param activity A Context of the application package implementing this class.
 	 */
 	public static void reStart(Activity activity) {
 		if (DEBUG)
