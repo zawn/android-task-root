@@ -289,13 +289,13 @@ final public class InitialActivity extends Activity {
 	 * 
 	 * @param packageContext A Context of the application package implementing this class.
 	 */
-	public static void exitTask(Context context) {
+	public static void exitTask(Context packageContext) {
 		if (DEBUG)
 			Log.i(TAG, "InitialActivity.exitTask()");
-		Intent intent = new Intent(context, InitialActivity.class);
+		Intent intent = new Intent(packageContext, InitialActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		intent.putExtra(CURRENT_LAUNCH_ACTIVITY, InitialActivity.class);
-		context.startActivity(intent);
+		packageContext.startActivity(intent);
 	}
 
 	/**
