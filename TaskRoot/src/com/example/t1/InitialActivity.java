@@ -8,7 +8,9 @@
  */
 package com.example.t1;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import android.app.Activity;
 import android.content.Context;
@@ -17,6 +19,7 @@ import android.content.pm.PackageItemInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -95,7 +98,20 @@ final public class InitialActivity extends Activity {
 
 	private void onHandleIntent(final Intent intent) {
 		if (DEBUG)
-			Log.i(TAG, "InitialActivity.onHandleIntent() TaskId:" + this.getTaskId());
+			Log.d(TAG, "InitialActivity.onHandleIntent() TaskId:" + this.getTaskId());
+		if (DEBUG) {
+			Bundle extras = intent.getExtras();
+			if (extras != null) {
+				Set<String> keySet = extras.keySet();
+				Log.d(TAG, "Here is the Intent extras : ");
+				for (Iterator<String> iterator = keySet.iterator(); iterator
+						.hasNext();) {
+					String string = (String) iterator.next();
+					Object object = extras.get(string);
+					Log.d(TAG, string + " : " + object);
+				}
+			}
+		}
 		final Class<?> cls = (Class<?>) intent.getSerializableExtra(CURRENT_LAUNCH_ACTIVITY);
 		final Bundle bundle = (Bundle) intent.getBundleExtra(BUNDLE_DATA);
 		if (DEBUG)
@@ -112,10 +128,14 @@ final public class InitialActivity extends Activity {
 		} else {
 			if (cls.isInstance(InitialActivity.this)) {
 				if ((Intent.FLAG_ACTIVITY_CLEAR_TOP & intent.getFlags()) == 0) {
-					throw new RuntimeException(
-							"InitialActivity is the root of this task.  If you want to exit this task, add Intent.FLAG_ACTIVITY_CLEAR_TOP flag in intent.");
+					i = mDefaultLaunchInent.cloneFilter();
+					if (bundle != null) {
+						i.putExtras(bundle);
+					}
+					startActivity(i);
+				} else {
+					initiativeDestroy();
 				}
-				initiativeDestroy();
 			} else {
 				i = new Intent(this, cls);
 				if (bundle != null) {
@@ -135,6 +155,8 @@ final public class InitialActivity extends Activity {
 		boolean expectedIntent = verifyExpectedIntent();
 
 		if (!expectedIntent) {
+			if (DEBUG)
+				Log.w(TAG, "InitialActivity.onCreate() expectedIntent :" + expectedIntent);
 			finish();
 			startActivity(getLauncherIntent(getIntent()));
 			return;
@@ -188,8 +210,11 @@ final public class InitialActivity extends Activity {
 		Intent intent = new Intent();
 		intent.setAction(Intent.ACTION_MAIN);
 		intent.addCategory(Intent.CATEGORY_LAUNCHER);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		if (Build.VERSION.SDK_INT >= 16) {
+			intent.setFlags(0x10200080);
+		} else {
+			intent.setFlags(0x10200000);
+		}
 		intent.setClass(this, this.getClass());
 		intent.putExtras(oldIntent);
 		return intent;

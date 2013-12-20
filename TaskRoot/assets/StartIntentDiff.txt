@@ -1,0 +1,20 @@
+MX2 android 4.2
+Intent From Launcher 
+12-18 17:18:03.082: I/ActivityManager(1772): START {act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200080 cmp=com.example.t1/.InitialActivity bnds=[47,359][207,557] u=0} from pid 2076
+
+
+12-18 17:30:17.127: I/ActivityManager(1772): START {act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000000 pkg=com.google.android.apps.authenticator2 cmp=com.google.android.apps.authenticator2/com.google.android.apps.authenticator.AuthenticatorActivity u=0} from pid 14661
+
+
+12-18 17:32:48.092: I/ActivityManager(1772): START {act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000080 pkg=com.google.android.apps.authenticator2 cmp=com.google.android.apps.authenticator2/com.google.android.apps.authenticator.AuthenticatorActivity u=0} from pid 14661
+
+
+
+12-18 17:38:04.602: I/ActivityManager(1772): START {act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000000 pkg=com.google.android.apps.authenticator2 cmp=com.google.android.apps.authenticator2/com.google.android.apps.authenticator.AuthenticatorActivity u=0} from pid 14661
+12-18 17:38:04.647: I/ActivityManager(1772): Start proc com.google.android.apps.authenticator2 for activity com.google.android.apps.authenticator2/com.google.android.apps.authenticator.AuthenticatorActivity: pid=18041 uid=10072 gids={3003, 1028}
+
+12-18 17:39:33.662: I/ActivityManager(1772): START {act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000080 pkg=com.google.android.apps.authenticator2 cmp=com.google.android.apps.authenticator2/com.google.android.apps.authenticator.AuthenticatorActivity u=0} from pid 14661
+
+
+12-19 10:12:34.221: I/InitialActivity.java(11316): Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200080 cmp=com.example.t1/.Activity1 bnds=[411,359][571,557] }
+
